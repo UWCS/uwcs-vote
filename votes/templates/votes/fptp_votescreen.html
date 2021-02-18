@@ -1,0 +1,8 @@
+{% extends 'votes/approval_votescreen.html' %}
+{% block voteelement %}
+    <input type="radio" class="d-none" name="selection"
+           id="{{ choice.formid }}"
+           value="{{ choice.id }}">
+{% endblock %}
+{% block alerts %}
+{% endblock %}

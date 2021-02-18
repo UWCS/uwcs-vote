@@ -1,0 +1,42 @@
+{% extends 'main.html' %}
+{% load markdown_tags %}
+
+{% block title %}{{ election.name }} - Votes{% endblock %}
+{% block pagetitle %}{{ election.name }}{% endblock %}
+
+{% block breadcrumbs_parents %}
+    <li class="breadcrumb-item"><a href="{% url 'votes:elections' %}">Votes</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'votes:admin' %}">Admin</a></li>
+{% endblock %}
+{% block breadcrumbs_child %}{{ election.name }}{% endblock %}
+
+{% block leftcontents %}
+    {{ block.super }}
+    {% if perms.votes.change_elections %}
+        <a class="btn btn-block btn-outline-dark mb-3" href="{% url "admin:votes_election_changelist" %}">Edit</a>
+    {% endif %}
+{% endblock %}
+
+{% block body %}
+    <div class="card">
+        <div class="card-body">
+            {% if election.description %}
+                <div class="mb-3">
+                    {{ election.description|parse_md_safe }}
+                </div>
+            {% endif %}
+            {% block results %}
+                <div class="list-group mb-3">
+                    {% for choice in choices %}
+                        <div class="list-group-item">
+                            <span class="badge badge-primary rounded-pill px-2 mr-2">{{ choice.aprvvote_set.count }}</span>
+                            {{ choice.name }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endblock %}
+
+        </div>
+    </div>
+{% endblock %}
+

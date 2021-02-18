@@ -1,0 +1,52 @@
+{% extends 'main.html' %}
+
+{% block title %}Votes{% endblock %}
+{% block pagetitle %}Votes{% endblock %}
+
+{% block breadcrumbs_parents %}
+    <li class="breadcrumb-item"><a href="{% url 'votes:elections' %}">Votes</a></li>
+{% endblock %}
+{% block breadcrumbs_child %}Admin{% endblock %}
+
+{% block leftcontents %}
+    {{ block.super }}
+    {% if perms.votes.change_elections %}
+        <a class="btn btn-block btn-outline-dark mb-3" href="{% url "admin:votes_election_changelist" %}">Edit</a>
+    {% endif %}
+{% endblock %}
+
+{% block body %}
+    <h2>Change</h2>
+    <p>
+        <a href="{% url "votes:create_election" %}"
+           class="btn btn-outline-success btn-block">
+            Create New
+        </a>
+    </p>
+    <p>
+        <a href="{% url "votes:tickets" %}"
+           class="btn btn-outline-success btn-block">
+            Issue Tickets
+        </a>
+    </p>
+    <div class="list-group mb-3">
+        {% for election in object_list %}
+            <a href="{% url "votes:update_election" election.id %}"
+               class="list-group-item list-group-item-action">
+                {{ election.name }}
+            </a>
+        {% endfor %}
+    </div>
+    <h2>Results</h2>
+    <div class="list-group">
+        {% for election in object_list %}
+            {% if election.open %}
+            {% else %}
+            <a href="{% url "votes:results" election.id %}"
+               class="list-group-item list-group-item-action">
+                {{ election.name }}
+            </a>
+            {% endif %}
+        {% endfor %}
+    </div>
+{% endblock %}

@@ -1,0 +1,53 @@
+{% extends 'main.html' %}
+{% load markdown_tags %}
+
+{% block title %}Edit - Votes{% endblock %}
+{% block pagetitle %}{% if object %}Edit{% else %}Create{% endif %} Election{% endblock %}
+
+{% block breadcrumbs_parents %}
+    <li class="breadcrumb-item"><a href="{% url 'votes:elections' %}">Votes</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'votes:admin' %}">Admin</a></li>
+    {% if object %}
+        <li class="breadcrumb-item">{{ object.name }}</li>
+    {% else %}
+    {% endif %}
+{% endblock %}
+{% block breadcrumbs_child %}{% if object %}Edit{% else %}Create{% endif %}{% endblock %}
+
+{% block body %}
+    {% include "parts/render_form.html" %}
+
+    {% if object %}
+        <h2>Candidates</h2>
+        <p>
+            <a href="{% url "votes:create_candidate" election.id %}"
+               class="btn btn-outline-success btn-block">
+                Create New
+            </a>
+        </p>
+        {% for candidate in object.candidate_set.all %}
+            <div class="card  mt-3">
+                <h3 class="card-header">
+                    {{ candidate.name }}
+                </h3>
+                {% if candidate.description %}
+                    <div class="card-body markdown-text">
+                        {{ candidate.description|parse_md_text }}
+                    </div>
+                {% endif %}
+                <div class="card-footer">
+                    <p class="btn-group">
+                        <a class="btn btn-outline-primary"
+                           href="{% url "votes:update_candidate" object.id candidate.id %}">
+                            <i class="fas fa-edit"></i><span class="sr-only">Edit Candidate</span>
+                        </a>
+                        <a class="btn btn-outline-danger"
+                           href="{% url "votes:update_candidate" object.id candidate.id %}">
+                            <i class="fas fa-trash-alt"></i><span class="sr-only">Delete Candidate</span>
+                        </a>
+                    </p>
+                </div>
+            </div>
+        {% endfor %}
+    {% endif %}
+{% endblock %}

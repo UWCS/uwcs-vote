@@ -1,0 +1,7 @@
+{% load crispy_forms_filters %}
+<form class="mb-2" method="post">
+    {% csrf_token %}
+    {{ form|crispy }}
+    <button type="button" class="btn btn-outline-success btn-block add-form-row mb-3">Add More</button>
+    <input type="submit" class="form-control btn-outline-{% if colour %}{{ colour }}{% else %}dark{% endif %}" value="{% if save %}{{ save }}{% else %}Save{% endif %}">
+</form>

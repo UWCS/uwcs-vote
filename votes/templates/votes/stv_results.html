@@ -1,0 +1,13 @@
+{% extends "votes/approval_results.html" %}
+{% block results %}
+    <h2>Avaliable seats: {{ election.seats }}</h2>
+    <h2>Winner{{ result.winners.all|pluralize }}</h2>
+    <div class="list-group">
+        {% for winner in result.winners.all %}
+            <div class="list-group-item mb-3">
+                {{ winner.name }}
+            </div>
+        {% endfor %}
+    </div>
+    <pre>{{ result.full_log }}</pre>
+{% endblock %}

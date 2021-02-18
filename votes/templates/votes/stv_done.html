@@ -1,0 +1,10 @@
+{% extends 'votes/approval_done.html' %}
+{% block selection %}
+    <p class="text-muted">Lower number is higher preference (think podium places or top ten lists)</p>
+    <ul class="list-group mb-3">
+        {% for i in object.stvpreference_set.all %}
+            <li class="list-group-item"><span
+                    class="badge badge-primary rounded-pill px-2 mr-2">{{ i.order }}</span>{{ i.candidate.name }}</li>
+        {% endfor %}
+    </ul>
+{% endblock %}

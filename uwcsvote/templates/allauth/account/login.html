@@ -1,0 +1,27 @@
+{% extends 'main.html' %}
+{% load socialaccount %}
+{% block title %}Login{% endblock %}
+{% block pagetitle %}Login{% endblock %}
+
+{% block breadcrumbs_child %}Login{% endblock %}
+
+{% block body %}
+
+    <div class="card">
+        <div class="card-body">
+            <p class="card-text text-center">
+                {% get_providers as socialaccount_providers %}
+
+                  {# There should only ever be 1 account provider so this is fine #}
+                  {% for provider in socialaccount_providers %}
+                    <a class="btn btn-large btn-block btn-primary"
+                       href="{% provider_login_url provider.id process="login" scope=scope auth_params=auth_params %}">
+                      Sign in using UWCS
+                    </a>
+                  {% endfor %}
+            </p>
+        </div>
+    </div>
+
+
+{% endblock %}

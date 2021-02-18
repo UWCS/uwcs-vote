@@ -1,0 +1,16 @@
+{% load static %}
+<script src="{% static "bootstrap3-typeahead.min.js" %}"></script>
+<script>/* enable popovers */
+$(function () {
+    $('[data-toggle="popover"]').popover({trigger: 'hover', html: true})
+})</script>
+<script>
+    $.get("{% url 'users:allmembers' %}", function (data) {
+        console.log("data");
+        console.log(data);
+        window.tagarople_user_typeahead_data=data; //Save for other functions to access (yes, naughty, I know)
+        $(".add-member-input").each(function (index) {
+            $(this).typeahead({source: data, theme: "bootstrap4"})
+        })
+    }, 'json');
+</script>

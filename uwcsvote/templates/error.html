@@ -1,0 +1,66 @@
+{% extends 'basecontent.html' %}
+{% load static %}
+{% load markdown_tags %}
+
+{% comment %}
+THIS IS USED BY ERRORS
+{% endcomment %}
+
+{% block head %}
+    {{ block.super }}
+    {# Add some SEO metadata to help discoverability #}
+    <meta name="robots" content="noindex">
+{% endblock %}
+
+{% block background %}class="bg-dark"{% endblock %}
+
+{% block navbar %}
+    <nav class="navbar navbar-dark bg-secondary mb-3">
+        <p class="d-flex flex-row justify-content-center w-100 mb-0">
+
+            <a class="" href="/"><img src="{% static "favicon-120.png" %}" height="120"
+                                                  alt="University of Warwick Computing Society"></a>
+
+        </p>
+    </nav>
+{% endblock %}
+
+{% block mainbody %}
+    <div class="row mb-3">
+        <div class="col-md-3 col-1">
+        </div>
+        <div class="col-md-6 col-10">
+            <div class="card">
+                <h1 class="card-header">{% block pagetitle %}{% endblock %}</h1>
+                <div class="card-body">
+                    <h4 class="card-title">{% block help_line %}{% endblock %}</h4>
+                    {% block help_content %}
+                    <p class="card-text">
+                        {% block help_text %}
+                            If you got here by following a link on this site, please contact the web admin with where the link was
+                            to get it fixed, otherwise please try visiting another page.
+                        {% endblock %}
+                    </p>
+                    {% endblock %}
+                </div>
+                <div class="card-footer">
+                    <button class="btn btn-block btn-outline-primary" onclick="goBack()">Go Back</button>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-1">
+        </div>
+    </div>
+{% endblock %}
+
+{% block footer %}
+{% endblock %}
+
+{% block bottomscripts %}
+    {{ block.super }}
+    <script>
+        function goBack() {
+          window.history.back();
+        }
+    </script>
+{% endblock %}

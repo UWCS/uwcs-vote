@@ -1,0 +1,107 @@
+{% extends 'basecontent.html' %}
+{% load static %}
+{% load markdown_tags %}
+
+{% comment %}
+THIS IS USED BY THE SITE
+{% endcomment %}
+
+{% block head %}
+    {{ block.super }}
+{% endblock %}
+
+{% block navbar %}
+    {% load static %}
+    {% spaceless %}
+        <nav class="navbar navbar-expand-md navbar-dark bg-dark mb-3">
+            <a class="navbar-brand" href="https://uwcs.co.uk/"><img src="{% static "favicon-32.png" %}" height="32"
+                                                                    alt="University of Warwick Computing Society"></a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+                    aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav mr-auto flex-wrap">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url "votes:elections" %}"><i class="fas fa-fw fa-vote-yea"></i>&nbsp;Elections</a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav">
+                    {% if request.user.is_authenticated %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url "account_logout" %}"><i
+                              class="fas fa-fw fa-sign-out-alt"></i>&nbsp;Logout</a>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'account_login' %}"><i
+                              class="fas fa-fw fa-sign-in-alt"></i>&nbsp;Login</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </nav>
+    {% endspaceless %}
+{% endblock %}
+
+{% block breadcrumbs %}
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            {% block breadcrumbs_parents %}
+            {% endblock %}
+            <li class="breadcrumb-item active" aria-current="page">{% block breadcrumbs_child %}{% endblock %}</li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block messages %}
+    {% if messages or not request.COOKIES.noticed_cookies %}
+        <div class="alerts">
+            {% for message in messages %}
+                <div class="alert alert-dismissible show fade{% if message.tags %} {{ message.tags }}{% endif %}"
+                     role="alert">
+                    {{ message }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% block leftcontents %}
+{% endblock %}
+
+{% block footer %}
+    <div class="nav ml-auto mr-auto d-flex flex-row justify-content-around">
+
+    </div>
+
+{% endblock %}
+
+{% block bottomscripts %}
+    {{ block.super }}
+    {# Typeahead #}
+    <script src="{% static 'bootstrap3-typeahead.min.js' %}"></script>
+    {# Markdown editor #}
+    <script src="{% static "markdown-editor.min.js" %}"></script>
+    <script>
+        $(document).ready(function () {
+            console.log("Getting ready.");
+            $(".markdown-input").MarkdownEditor();
+            $('[data-toggle="tooltip"]').tooltip()
+        });
+
+        function setCookieForeverish(cname, cvalue) {
+            var d = new Date();
+            var expires = "expires=Tue, 19 Jan 2038 03:14:07 UTC";
+            document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+        }
+
+        $('#cookies_warning').on('close.bs.alert', function () {
+            setCookieForeverish("noticed_cookies", "true")
+        })
+    </script>
+{% endblock %}

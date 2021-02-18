@@ -1,0 +1,35 @@
+{% extends 'main.html' %}
+
+{% block title %}Votes{% endblock %}
+{% block pagetitle %}Votes{% endblock %}
+
+{% block breadcrumbs_child %}Votes{% endblock %}
+
+{% block leftcontents %}
+    {{ block.super }}
+    {% if perms.votes.change_elections %}
+        <a class="btn btn-block btn-outline-dark mb-3" href="{% url "admin:index" %}">Admin</a>
+    {% endif %}
+{% endblock %}
+
+{% block body %}
+    <div class="card">
+        <div class="card-body">
+            <h2 class="card-text">Welcome to the UWCS voting portal.</h2>
+            <p class="card-text">
+                <strong>Please note</strong>: This is still in BETA.
+                While every effort has been made to ensure that it is free of bugs, some may still remain.
+                If you encounter any, please contact the Tech Officer as soon as possible.
+            </p>
+            <p>
+                Additionally, if you can't see an election you believe you should be able too, please contact the returning officer.
+            </p>
+            {% if user.is_anonymous %}
+                <p class="card-text">Please <a href="{% url "account_login" %}">Sign In</a> to continue.</p>
+            {% else %}
+                <p class="card-text">You can view the elections you are eligible to vote in on the <a href="{% url "votes:elections" %}">Elections</a> Page.</p>
+            {% endif %}
+        </div>
+
+    </div>
+{% endblock %}

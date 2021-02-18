@@ -1,0 +1,15 @@
+{% extends 'main.html' %}
+{% load markdown_tags %}
+
+{% block title %}Tickets - Votes{% endblock %}
+{% block pagetitle %}Issue Tickets{% endblock %}
+
+{% block breadcrumbs_parents %}
+    <li class="breadcrumb-item"><a href="{% url 'votes:elections' %}">Votes</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'votes:admin' %}">Admin</a></li>
+{% endblock %}
+{% block breadcrumbs_child %}Ticket{% endblock %}
+
+{% block body %}
+    {% include "parts/render_form.html" %}
+{% endblock %}

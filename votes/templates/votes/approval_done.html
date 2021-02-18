@@ -1,0 +1,42 @@
+{% extends 'main.html' %}
+{% load markdown_tags %}
+
+{% block title %}{{ object.election.name }} - Votes{% endblock %}
+{% block pagetitle %}Vote Complete{% endblock %}
+
+{% block breadcrumbs_parents %}
+    <li class="breadcrumb-item"><a href="{% url 'votes:elections' %}">Votes</a></li>
+    <li class="breadcrumb-item">{{ object.election.name }}</li>
+{% endblock %}
+{% block breadcrumbs_child %}Complete{% endblock %}
+
+{% block leftcontents %}
+    {{ block.super }}
+    {% if perms.votes.change_elections %}
+        <a class="btn btn-block btn-outline-dark mb-3" href="{% url "admin:votes_election_changelist" %}">Edit</a>
+    {% endif %}
+{% endblock %}
+
+{% block body %}
+    <div class="card">
+        <div class="card-body">
+            <p class="card-text">Congratulations, your vote has been cast!</p>
+            <p><strong>Date/time:</strong> {{ object.time }}</p>
+            <h4>Selection{{ object.selection.count|pluralize }}:</h4>
+            {% block selection %}
+                <ul class="list-group mb-3">
+                    {% for i in object.selection.all %}
+                        <li class="list-group-item">{{ i.name }}</li>
+                    {% endfor %}
+                </ul>
+            {% endblock %}
+            <p class="card-text">Consider bookmarking this page for your personal reference</p>
+            <p class="card-text">If anything appears wrong, please contact the returning officer immediately, with the
+                following uuid:
+                <br>
+                <code>{{ object.uuid }}</code>
+            </p>
+        </div>
+    </div>
+{% endblock %}
+

@@ -1,0 +1,20 @@
+{% extends 'main.html' %}
+{% load markdown_tags %}
+
+{% block title %}Edit - Votes{% endblock %}
+{% block pagetitle %}{% if object %}Edit{% else %}Create{% endif %} Election{% endblock %}
+
+{% block breadcrumbs_parents %}
+    <li class="breadcrumb-item"><a href="{% url 'votes:elections' %}">Votes</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'votes:admin' %}">Admin</a></li>
+    {% if object %}
+        <li class="breadcrumb-item">{{ object.election.name }}</li>
+        <li class="breadcrumb-item">{{ object.name }}</li>
+    {% else %}
+    {% endif %}
+{% endblock %}
+{% block breadcrumbs_child %}{% if object %}Edit{% else %}Create{% endif %}{% endblock %}
+
+{% block body %}
+    {% include "parts/render_form.html" %}
+{% endblock %}

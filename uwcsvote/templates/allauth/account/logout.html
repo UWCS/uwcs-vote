@@ -1,0 +1,27 @@
+{% extends 'main.html' %}
+{% load socialaccount %}
+{% block title %}Logout{% endblock %}
+{% block pagetitle %}Logout{% endblock %}
+
+{% block breadcrumbs_child %}Logout{% endblock %}
+
+{% block body %}
+
+  <div class="card">
+    <div class="card-body">
+      <h2>Are you sure you want to log out?</h2>
+      <form method="post" action="{% url 'account_logout' %}">
+        {% csrf_token %}
+        {% if redirect_field_value %}
+          <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}"/>
+        {% endif %}
+        <div class="btn-group btn-block">
+          <button class="btn btn-primary" type="submit">Log out</button>
+          <a class="btn btn-dark" href="{% url 'votes:elections' %}">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+
+{% endblock %}
