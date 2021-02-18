@@ -1,0 +1,16 @@
+*
+
+!.gitignore
+!fonts/
+!fonts/*
+!scss/
+!scss/*
+!css/
+!css/*
+!svg/
+!svg/*
+!js/
+!js/*
+!img/
+!img/*
+!favicon*
