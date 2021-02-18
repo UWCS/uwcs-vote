@@ -71,6 +71,9 @@ class Vote(models.Model):
     class Meta:
         abstract = True
 
+    def __str__(self):
+        return str(self.uuid)
+
 
 class FPTPVote(Vote):
     selection = models.ForeignKey(Candidate, models.CASCADE)
@@ -98,3 +101,6 @@ class STVResult(models.Model):
     full_log = models.TextField()
     winners = models.ManyToManyField(Candidate)
     generated = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return str(self.election)

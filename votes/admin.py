@@ -15,9 +15,17 @@ class CandidateInline(admin.StackedInline):
     extra = 1
 
 
+class FPTPVoteAdmin(admin.ModelAdmin):
+    readonly_fields = ['election', 'uuid', 'time', 'selection']
+
+
 class STVVoteAdmin(admin.ModelAdmin):
     inlines = [PreferenceInline]
     readonly_fields = ['election', 'uuid', 'time', 'selection']
+
+
+class STVResultAdmin(admin.ModelAdmin):
+    readonly_fields = ['election', 'full_log', 'winners', 'generated']
 
 
 class ElectionAdmin(admin.ModelAdmin):
@@ -26,8 +34,8 @@ class ElectionAdmin(admin.ModelAdmin):
 
 # Register your models here.
 admin.site.register(Election, ElectionAdmin)
-admin.site.register(FPTPVote)
-admin.site.register(APRVVote)
+admin.site.register(FPTPVote, FPTPVoteAdmin)
+admin.site.register(APRVVote, FPTPVoteAdmin)
 admin.site.register(Ticket)
 admin.site.register(STVVote, STVVoteAdmin)
-admin.site.register(STVResult)
+admin.site.register(STVResult, STVResultAdmin)
