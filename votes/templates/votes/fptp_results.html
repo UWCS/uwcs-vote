@@ -1,5 +1,6 @@
 {% extends "votes/approval_results.html" %}
 {% block results %}
+    <h2>Total Turnout: {{ election.fptpvote_set.count }}</h2>
     <div class="list-group mb-3">
         {% for choice in choices %}
             <div class="list-group-item">

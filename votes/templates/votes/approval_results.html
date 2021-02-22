@@ -26,10 +26,12 @@
                 </div>
             {% endif %}
             {% block results %}
+                <h2>Total Turnout: {{ election.aprvvote_set.count }}</h2>
                 <div class="list-group mb-3">
                     {% for choice in choices %}
                         <div class="list-group-item">
-                            <span class="badge badge-primary rounded-pill px-2 mr-2">{{ choice.aprvvote_set.count }}</span>
+                            <span
+                              class="badge badge-primary rounded-pill px-2 mr-2">{{ choice.aprvvote_set.count }}</span>
                             {{ choice.name }}
                         </div>
                     {% endfor %}
