@@ -11,4 +11,7 @@
         {% endfor %}
     </div>
     <pre>{{ result.full_log }}</pre>
+    <p>
+        <a class="btn btn-block btn-outline-dark" href="{% url "votes:stv_all_votes" election.id %}">See Votes</a>
+    </p>
 {% endblock %}

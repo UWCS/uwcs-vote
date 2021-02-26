@@ -335,6 +335,23 @@ class STVResultView(PermissionRequiredMixin, ListView):
         return ctxt
 
 
+class STVAllVoteView(PermissionRequiredMixin, ListView):
+    model = Candidate
+    permission_required = PERMS.votes.view_stvvote
+    template_name = "votes/stv_vote_list.html"
+    context_object_name = "choices"
+
+    def get_queryset(self):
+        self.election = get_object_or_404(Election, id=self.kwargs['election'], vote_type=Election.Types.STV,
+                                          open=False)
+        return self.election.candidate_set.all()
+
+    def get_context_data(self, **kwargs):
+        ctxt = super().get_context_data(**kwargs)
+        ctxt['election'] = self.election
+        return ctxt
+
+
 class STVVoteView(UserPassesTestMixin, TemplateView):
     template_name = "votes/stv_votescreen.html"
 

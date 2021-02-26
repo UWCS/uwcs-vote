@@ -1,0 +1,39 @@
+{% extends 'main.html' %}
+{% load markdown_tags %}
+
+{% block title %}{{ election.name }} - Votes{% endblock %}
+{% block pagetitle %}{{ election.name }}{% endblock %}
+
+{% block breadcrumbs_parents %}
+    <li class="breadcrumb-item"><a href="{% url 'votes:elections' %}">Votes</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'votes:admin' %}">Admin</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'votes:stv_results' election.id %}">{{ election.name }}</a></li>
+{% endblock %}
+{% block breadcrumbs_child %}All Votes{% endblock %}
+
+{% block leftcontents %}
+    {{ block.super }}
+    {% if perms.votes.change_elections %}
+        <a class="btn btn-block btn-outline-dark mb-3" href="{% url "admin:votes_election_changelist" %}">Edit</a>
+    {% endif %}
+{% endblock %}
+
+{% block body %}
+    <div class="card">
+        <div class="card-body">
+            <div class="d-flex flex-wrap">
+                {% for vote in election.stvvote_set.all %}
+                    <div class="card m-1">
+                        <div class="card-body">
+                            <ol class="list-group">
+                                {% for pref in vote.stvpreference_set.all %}
+                                    <li class="list-group-item">{{ pref.candidate.name }}</li>
+                                {% endfor %}
+                            </ol>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
