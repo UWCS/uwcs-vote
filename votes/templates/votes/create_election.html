@@ -32,7 +32,7 @@
                 </h3>
                 {% if candidate.description %}
                     <div class="card-body markdown-text">
-                        {{ candidate.description|parse_md_text }}
+                        {{ candidate.description|parse_md_safe }}
                     </div>
                 {% endif %}
                 <div class="card-footer">

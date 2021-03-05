@@ -10,7 +10,7 @@ MD_INPUT_SAFE = {
 
 MD_INPUT_TEXT = {
     'class': 'markdown-input',
-    'data-endpoint': reverse_lazy('utilities:preview_text'),
+    'data-endpoint': reverse_lazy('utilities:preview_safe'),
 }
 
 

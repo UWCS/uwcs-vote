@@ -67,9 +67,9 @@
                             <label class="mb-0 card-header" for="{{ choice.formid }}" class="">
                                 {{ choice.name }}
                             </label>
-                            {% if choice.description|parse_md_text %}
+                            {% if choice.description|parse_md_safe %}
                                 <div class="card-body markdown-text">
-                                    {{ choice.description|parse_md_text }}
+                                    {{ choice.description|parse_md_safe }}
                                 </div>
                             {% endif %}
                         </div>
