@@ -34,7 +34,7 @@ class AdminView(PermissionRequiredMixin, ListView):
     context_object_name = "elections"
 
     def get_queryset(self):
-        return Election.objects.all()
+        return Election.objects.filter(archived=False)
 
 
 class TicketView(PermissionRequiredMixin, FormView):
@@ -149,6 +149,7 @@ class ResultView(PermissionRequiredMixin, RedirectView):
             return reverse('votes:stv_results', args=[self.kwargs['election']])
         else:
             raise NotImplementedError()
+
 
 class ApprovalResultView(PermissionRequiredMixin, ListView):
     model = Candidate

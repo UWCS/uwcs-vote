@@ -1,6 +1,7 @@
 import uuid as uuid
 from django.db import models
 
+
 # Create your models here.
 class Election(models.Model):
     class Types(models.IntegerChoices):
@@ -15,6 +16,7 @@ class Election(models.Model):
                                     help_text="Ignored except in Plurality. Number of candidates selectable per vote")
     seats = models.IntegerField(default=1, help_text="Ignored except in STV. Number of people who can win")
     open = models.BooleanField(default=False)
+    archived = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name
@@ -28,6 +30,9 @@ class Election(models.Model):
             return self.stvvote_set.all()
         else:
             raise NotImplemented()
+
+    class Meta:
+        ordering = ('id',)
 
 
 class Candidate(models.Model):
