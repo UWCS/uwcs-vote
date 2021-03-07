@@ -17,11 +17,17 @@ class CandidateInline(admin.StackedInline):
 
 class FPTPVoteAdmin(admin.ModelAdmin):
     readonly_fields = ['election', 'uuid', 'time', 'selection']
+    search_fields = ['uuid']
 
 
 class STVVoteAdmin(admin.ModelAdmin):
     inlines = [PreferenceInline]
     readonly_fields = ['election', 'uuid', 'time', 'selection']
+    search_fields = ['uuid']
+
+
+class TicketAdmin(admin.ModelAdmin):
+    search_fields = ['uuid']
 
 
 class STVResultAdmin(admin.ModelAdmin):
@@ -36,6 +42,6 @@ class ElectionAdmin(admin.ModelAdmin):
 admin.site.register(Election, ElectionAdmin)
 admin.site.register(FPTPVote, FPTPVoteAdmin)
 admin.site.register(APRVVote, FPTPVoteAdmin)
-admin.site.register(Ticket)
+admin.site.register(Ticket, TicketAdmin)
 admin.site.register(STVVote, STVVoteAdmin)
 admin.site.register(STVResult, STVResultAdmin)
