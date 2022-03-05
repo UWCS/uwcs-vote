@@ -11,7 +11,7 @@
 
 {% block leftcontents %}
     {{ block.super }}
-    {% if perms.votes.change_elections %}
+    {% if perms.votes.change_election %}
         <a class="btn btn-block btn-outline-dark mb-3" href="{% url "admin:votes_election_changelist" %}">Edit</a>
     {% endif %}
 {% endblock %}
@@ -64,8 +64,8 @@
                 <div id="sortable_reject" class="card-body">
                     {% for choice in choices %}
                         <div class="card mb-3" data-voteid="{{ choice.formid }}">
-                            <label class="mb-0 card-header" for="{{ choice.formid }}" class="">
-                                {{ choice.name }}
+                            <label class="mb-0 card-header" for="{{ choice.formid }}">
+                                <strong>{{ choice.name }}</strong>
                             </label>
                             {% if choice.description|parse_md_safe %}
                                 <div class="card-body markdown-text">

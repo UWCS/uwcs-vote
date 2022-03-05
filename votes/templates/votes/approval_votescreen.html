@@ -11,8 +11,8 @@
 
 {% block leftcontents %}
     {{ block.super }}
-    {% if perms.votes.change_elections %}
-        <a class="btn btn-block btn-outline-dark mb-3" href="{% url "admin:votes_election_changelist" %}">Edit</a>
+    {% if perms.votes.change_election %}
+        <a class="btn btn-block btn-outline-dark mb-3" href="{% url "admin:votes_election_change" election.id %}">Edit</a>
     {% endif %}
 {% endblock %}
 
