@@ -34,7 +34,7 @@ class CandidateForm(ModelForm):
 class IDTicketForm(Form):
     ids = CharField(help_text="A list of whitespace separated uni-ids",
                     widget=Textarea(), label="IDs")
-    elections = ModelMultipleChoiceField(Election.objects.all())
+    elections = ModelMultipleChoiceField(Election.objects.filter(archived=False))
 
 
 class DeleteTicketForm(Form):
