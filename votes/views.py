@@ -1,9 +1,12 @@
 import random
 from operator import itemgetter, attrgetter
 
-from django.shortcuts import render
+from django.contrib.messages import add_message
+from django.contrib.messages import constants as messages
+from django.db import transaction, DatabaseError
+from django.shortcuts import render, Http404
 from django.core.exceptions import ObjectDoesNotExist
-from django.db.models import Count
+from django.db.models import Count, Q
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin, UserPassesTestMixin
 from django.urls import reverse_lazy
 from django.views.generic import View, TemplateView, ListView, DetailView, RedirectView, CreateView, UpdateView, \
@@ -11,8 +14,10 @@ from django.views.generic import View, TemplateView, ListView, DetailView, Redir
 from django.shortcuts import get_object_or_404, HttpResponseRedirect, reverse
 
 from uwcsvote.permissions import PERMS
-from .forms import ElectionForm, CandidateForm, DateTicketForm
-from .models import Election, STVVote, STVPreference, FPTPVote, APRVVote, Candidate, Ticket, Vote, STVResult
+from .forms import ElectionForm, CandidateForm, IDTicketForm, DeleteTicketForm, \
+    ResetVoteForm, NullForm
+from .models import Election, STVVote, STVPreference, FPTPVote, APRVVote, \
+    Candidate, Ticket, Vote, STVResult
 from .stv import Election as StvCalculator
 
 
@@ -23,8 +28,13 @@ class HomeView(LoginRequiredMixin, ListView):
     context_object_name = "elections"
 
     def get_queryset(self):
-        tickets = self.request.user.member.ticket_set.filter(spent=False)
+        tickets = self.request.user.member.ticket_set.filter()
         return Election.objects.filter(ticket__in=tickets, open=True)
+
+    def get_context_data(self, *args, **kwargs):
+        ctxt = super().get_context_data(*args, **kwargs)
+        ctxt['tickets'] = self.request.user.member.ticket_set.filter()
+        return ctxt
 
 
 class AdminView(PermissionRequiredMixin, ListView):
@@ -34,20 +44,84 @@ class AdminView(PermissionRequiredMixin, ListView):
     context_object_name = "elections"
 
     def get_queryset(self):
-        return Election.objects.filter(archived=False)
+        return Election.objects.filter(archived=False).order_by('id')
+
+    def get_context_data(self, *args, **kwargs):
+        ctxt = super().get_context_data(*args, **kwargs)
+        ctxt['open_elections'] = self.get_queryset().filter(open=True)
+        ctxt['closed_elections'] = self.get_queryset().filter(
+            Q(stvvote__isnull=False) | Q(aprvvote__isnull=False) | Q(fptpvote__isnull=False),
+            open=False).distinct()
+        return ctxt
 
 
-class TicketView(PermissionRequiredMixin, FormView):
+class TicketView(PermissionRequiredMixin, TemplateView):
     permission_required = PERMS.votes.add_ticket
-    form_class = DateTicketForm
+    template_name = "votes/ticket.html"
+
+
+class IDTicketView(PermissionRequiredMixin, FormView):
+    permission_required = PERMS.votes.add_ticket
+    form_class = IDTicketForm
     template_name = "votes/tickets.html"
     success_url = reverse_lazy('votes:admin')
 
     def form_valid(self, form):
-
         for uniid in form.cleaned_data['ids'].split():
             for election in form.cleaned_data['elections']:
                 Ticket.objects.get_or_create(member=uniid, election=election)
+        return super().form_valid(form)
+
+
+class DeleteTicketView(PermissionRequiredMixin, FormView):
+    permission_required = PERMS.votes.delete_ticket
+    form_class = DeleteTicketForm
+    template_name = "votes/delete_tickets.html"
+    success_url = reverse_lazy('votes:admin')
+
+    def form_valid(self, form):
+        for election in form.cleaned_data['elections']:
+            Ticket.objects.filter(election=election).delete()
+        return super().form_valid(form)
+
+
+class ResetVoteView(PermissionRequiredMixin, FormView):
+    permission_required = PERMS.votes.change_ticket
+    form_class = ResetVoteForm
+    template_name = "votes/reset_vote.html"
+    success_url = reverse_lazy('votes:admin')
+
+    def form_valid(self, form):
+        uuid = form.cleaned_data['uuid']
+        ticket = get_object_or_404(Ticket, uuid=uuid)
+        if ticket.election.vote_type == Election.Types.FPTP:
+            vote = get_object_or_404(FPTPVote, uuid=uuid)
+        elif ticket.election.vote_type == Election.Types.STV:
+            vote = get_object_or_404(STVVote, uuid=uuid)
+        elif ticket.election.vote_type == Election.Types.APRV:
+            vote = get_object_or_404(APRVVote, uuid=uuid)
+        else:
+            raise Http404()
+        try:
+            with transaction.atomic():
+                vote.delete()
+                ticket.spent = False
+                ticket.save()
+        except DatabaseError:
+            add_message(self.request, messages.ERROR, "Unable to delete vote")
+
+        return super().form_valid(form)
+
+
+class CloseElectionView(PermissionRequiredMixin, FormView):
+    permission_required = PERMS.votes.change_election
+    form_class = NullForm
+    template_name = "votes/ticket.html"
+    success_url = reverse_lazy('votes:admin')
+
+    def form_valid(self, form):
+        Election.objects.filter(open=True, archived=False).update(open=False)
+        add_message(self.request, messages.SUCCESS, "All votes closed")
         return super().form_valid(form)
 
 
@@ -82,7 +156,8 @@ class CreateCandidate(PermissionRequiredMixin, CreateView):
         return reverse("votes:update_election", args=[self.kwargs['election']])
 
     def form_valid(self, form):
-        form.instance.election = get_object_or_404(Election, id=self.kwargs['election'])
+        form.instance.election = get_object_or_404(
+            Election, id=self.kwargs['election'])
         return super().form_valid(form)
 
 
@@ -124,7 +199,8 @@ class VoteView(LoginRequiredMixin, RedirectView):
     def get_redirect_url(self, *args, **kwargs):
         election = self.get_object()
         if election.vote_type == Election.Types.APRV:
-            return reverse('votes:approval_vote', args=[self.kwargs['election']])
+            return reverse('votes:approval_vote',
+                           args=[self.kwargs['election']])
         elif election.vote_type == Election.Types.FPTP:
             return reverse('votes:fptp_vote', args=[self.kwargs['election']])
         elif election.vote_type == Election.Types.STV:
@@ -142,7 +218,8 @@ class ResultView(PermissionRequiredMixin, RedirectView):
     def get_redirect_url(self, *args, **kwargs):
         election = self.get_object()
         if election.vote_type == Election.Types.APRV:
-            return reverse('votes:approval_results', args=[self.kwargs['election']])
+            return reverse('votes:approval_results',
+                           args=[self.kwargs['election']])
         elif election.vote_type == Election.Types.FPTP:
             return reverse('votes:fptp_results', args=[self.kwargs['election']])
         elif election.vote_type == Election.Types.STV:
@@ -159,14 +236,16 @@ class ApprovalResultView(PermissionRequiredMixin, ListView):
     context_object_name = "choices"
 
     def get_queryset(self):
-        self.election = get_object_or_404(Election, id=self.kwargs['election'], vote_type=Election.Types.APRV,
+        self.election = get_object_or_404(Election, id=self.kwargs['election'],
+                                          vote_type=Election.Types.APRV,
                                           open=False)
         return self.election.candidate_set.all()
 
     def get_context_data(self, **kwargs):
         ctxt = super().get_context_data(**kwargs)
         ctxt['election'] = self.election
-        ctxt['choices'] = sorted(ctxt['choices'], key=lambda x: -x.votes().count())
+        ctxt['choices'] = sorted(
+            ctxt['choices'], key=lambda x: -x.votes().count())
         return ctxt
 
 
@@ -182,8 +261,8 @@ class ApprovalVoteView(UserPassesTestMixin, TemplateView):
 
     def post(self, request, **kwargs):
         self.get_context_data(**kwargs)
-        ticket = get_object_or_404(request.user.member.ticket_set.all(), election=self.election, spent=False)
-        print(request.POST)
+        ticket = get_object_or_404(
+            request.user.member.ticket_set.all(), election=self.election, spent=False)
         errors = []
         if "selection" not in request.POST:
             errors.append("Please select at least one option")
@@ -235,14 +314,16 @@ class FPTPResultView(PermissionRequiredMixin, ListView):
     context_object_name = "choices"
 
     def get_queryset(self):
-        self.election = get_object_or_404(Election, id=self.kwargs['election'], vote_type=Election.Types.FPTP,
+        self.election = get_object_or_404(Election, id=self.kwargs['election'],
+                                          vote_type=Election.Types.FPTP,
                                           open=False)
         return self.election.candidate_set.all()
 
     def get_context_data(self, **kwargs):
         ctxt = super().get_context_data(**kwargs)
         ctxt['election'] = self.election
-        ctxt['choices'] = sorted(ctxt['choices'], key=lambda x: -x.votes().count())
+        ctxt['choices'] = sorted(
+            ctxt['choices'], key=lambda x: -x.votes().count())
         return ctxt
 
 
@@ -252,13 +333,17 @@ class FPTPVoteView(UserPassesTestMixin, TemplateView):
     def test_func(self):
         if self.request.user.is_anonymous:
             return False
-        self.election = get_object_or_404(Election, id=self.kwargs['election'], open=True,
+        self.election = get_object_or_404(Election, id=self.kwargs['election'],
+                                          open=True,
                                           vote_type=Election.Types.FPTP)
-        return self.request.user.member.ticket_set.filter(election=self.election, spent=False).exists()
+        return self.request.user.member.ticket_set.filter(
+            election=self.election, spent=False).exists()
 
     def post(self, request, **kwargs):
         self.get_context_data(**kwargs)
-        ticket = get_object_or_404(request.user.member.ticket_set.all(), election=self.election, spent=False)
+        ticket = get_object_or_404(
+            request.user.member.ticket_set.all(), election=self.election,
+            spent=False)
         print(request.POST)
         errors = []
         if "selection" not in request.POST:
@@ -288,11 +373,13 @@ class FPTPVoteView(UserPassesTestMixin, TemplateView):
             ticket.save()
 
             return HttpResponseRedirect(
-                reverse("votes:vote_done", kwargs={'election': self.election.id, 'slug': vote.uuid}))
+                reverse("votes:vote_done", kwargs={'election': self.election.id,
+                                                   'slug': vote.uuid}))
 
     def get_context_data(self, **kwargs):
         ctxt = super().get_context_data(**kwargs)
-        self.election = get_object_or_404(Election, id=self.kwargs['election'], open=True,
+        self.election = get_object_or_404(Election, id=self.kwargs['election'],
+                                          open=True,
                                           vote_type=Election.Types.FPTP)
         ctxt['election'] = self.election
         ctxt['choices'] = list(self.election.candidate_set.all())
@@ -307,7 +394,8 @@ class STVResultView(PermissionRequiredMixin, ListView):
     context_object_name = "choices"
 
     def get_queryset(self):
-        self.election = get_object_or_404(Election, id=self.kwargs['election'], vote_type=Election.Types.STV,
+        self.election = get_object_or_404(Election, id=self.kwargs['election'],
+                                          vote_type=Election.Types.STV,
                                           open=False)
         return self.election.candidate_set.all()
 
@@ -317,39 +405,27 @@ class STVResultView(PermissionRequiredMixin, ListView):
         try:
             res = self.election.stvresult
         except STVResult.DoesNotExist:
-            candidates = set(map(attrgetter('id'), self.election.candidate_set.all()))
-            withdrawn = set(map(attrgetter('id'), self.election.candidate_set.filter(state=Candidate.State.WITHDRAWN)))
+            candidates = set(
+                map(attrgetter('id'), self.election.candidate_set.all()))
+            withdrawn = set(
+                map(attrgetter('id'), self.election.candidate_set.filter(
+                    state=Candidate.State.WITHDRAWN)))
             votes = []
             for i in self.election.stvvote_set.all():
                 vote = []
-                for j in STVPreference.objects.filter(stvvote=i).order_by('order'):
+                for j in STVPreference.objects.filter(stvvote=i).order_by(
+                        'order'):
                     vote.append(int(j.candidate_id))
                 votes.append(tuple(vote))
 
             calc = StvCalculator(candidates, votes, self.election.seats)
             calc.withdraw(withdrawn)
             calc.full_election()
-            res = STVResult.objects.create(election=self.election, full_log="\n".join(calc.fulllog))
+            res = STVResult.objects.create(
+                election=self.election, full_log="\n".join(calc.fulllog))
             res.save()
             res.winners.add(*Candidate.objects.filter(id__in=calc.winners()))
         ctxt['result'] = res
-        return ctxt
-
-
-class STVAllVoteView(PermissionRequiredMixin, ListView):
-    model = Candidate
-    permission_required = PERMS.votes.view_stvvote
-    template_name = "votes/stv_vote_list.html"
-    context_object_name = "choices"
-
-    def get_queryset(self):
-        self.election = get_object_or_404(Election, id=self.kwargs['election'], vote_type=Election.Types.STV,
-                                          open=False)
-        return self.election.candidate_set.all()
-
-    def get_context_data(self, **kwargs):
-        ctxt = super().get_context_data(**kwargs)
-        ctxt['election'] = self.election
         return ctxt
 
 
@@ -359,19 +435,26 @@ class STVVoteView(UserPassesTestMixin, TemplateView):
     def test_func(self):
         if self.request.user.is_anonymous:
             return False
-        self.election = get_object_or_404(Election, id=self.kwargs['election'], open=True, vote_type=Election.Types.STV)
-        return self.request.user.member.ticket_set.filter(election=self.election, spent=False).exists()
+        self.election = get_object_or_404(
+            Election, id=self.kwargs['election'], open=True,
+            vote_type=Election.Types.STV)
+        return self.request.user.member.ticket_set.filter(
+            election=self.election, spent=False).exists()
 
     def post(self, request, **kwargs):
         self.get_context_data(**kwargs)
-        ticket = get_object_or_404(request.user.member.ticket_set.all(), election=self.election, spent=False)
+        ticket = get_object_or_404(
+            request.user.member.ticket_set.all(),
+            election=self.election,
+            spent=False)
         print(request.POST)
         errors = []
         allowed = set(a.id for a in self.election.candidate_set.all())
 
         # Almost all of these errors should never be seen (unless someone is bypassing the js)
         submitted_candidates = set(request.POST.keys())
-        submitted_candidates.remove('csrfmiddlewaretoken')  # remove csrf token (the only valid non-vote value)
+        # remove csrf token (the only valid non-vote value)
+        submitted_candidates.remove('csrfmiddlewaretoken')
         try:
             submitted_candidates = set(map(int, submitted_candidates))
         except ValueError:
@@ -396,7 +479,8 @@ class STVVoteView(UserPassesTestMixin, TemplateView):
         if len(selection) != len(set(map(itemgetter(1), selection))):
             errors.append("Invalid preference (repeated)")
         if len(selection) == 0:
-            errors.append("Please select at least one candidate")  # This one is actually possible
+            # This one is actually possible
+            errors.append("Please select at least one candidate")
 
         if errors:
             return self.get(request, errors=set(errors), previous=request.POST)
@@ -407,20 +491,42 @@ class STVVoteView(UserPassesTestMixin, TemplateView):
             )
             vote.save()
             for i in selection:
-                STVPreference.objects.create(stvvote=vote, candidate_id=i[0], order=i[1])
+                STVPreference.objects.create(
+                    stvvote=vote, candidate_id=i[0], order=i[1])
 
             ticket.spent = True
             ticket.save()
 
             return HttpResponseRedirect(
-                reverse("votes:vote_done", kwargs={'election': self.election.id, 'slug': vote.uuid}))
+                reverse("votes:vote_done",
+                        kwargs={'election': self.election.id,
+                                'slug': vote.uuid}))
 
     def get_context_data(self, **kwargs):
         ctxt = super().get_context_data(**kwargs)
-        self.election = get_object_or_404(Election, id=self.kwargs['election'], open=True, vote_type=Election.Types.STV)
+        self.election = get_object_or_404(
+            Election, id=self.kwargs['election'], open=True, vote_type=Election.Types.STV)
         ctxt['election'] = self.election
         ctxt['choices'] = list(self.election.candidate_set.all())
         random.shuffle(ctxt['choices'])
+        return ctxt
+
+
+class STVAllVoteView(PermissionRequiredMixin, ListView):
+    model = Candidate
+    permission_required = PERMS.votes.view_stvvote
+    template_name = "votes/stv_vote_list.html"
+    context_object_name = "choices"
+
+    def get_queryset(self):
+        self.election = get_object_or_404(Election, id=self.kwargs['election'],
+                                          vote_type=Election.Types.STV,
+                                          open=False)
+        return self.election.candidate_set.all()
+
+    def get_context_data(self, **kwargs):
+        ctxt = super().get_context_data(**kwargs)
+        ctxt['election'] = self.election
         return ctxt
 
 

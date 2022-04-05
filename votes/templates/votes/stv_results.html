@@ -10,8 +10,18 @@
             </div>
         {% endfor %}
     </div>
+    <h3>Breakdown</h3>
+    <div class="list-group mb-2">
+        {% for i in election.candidate_set.all|dictsort:"id" %}
+            <p class="list-group-item"><strong class="d-inline-block align-middle mr-2" style="width: 2rem">{{ i.id }}</strong><span class="d-inline-block align-middle">{{ i.name }}</span></p>
+        {% endfor %}
+    </div>
     <pre>{{ result.full_log }}</pre>
-    <p>
-        <a class="btn btn-block btn-outline-dark" href="{% url "votes:stv_all_votes" election.id %}">See Votes</a>
-    </p>
+{% endblock %}
+
+{% block leftcontents %}
+    {{ block.super }}
+    {% if perms.votes.change_results %}
+        <a class="btn btn-block btn-outline-dark mb-3" href="{% url "admin:votes_stvresult_change" result.id %}">Edit Result</a>
+    {% endif %}
 {% endblock %}
