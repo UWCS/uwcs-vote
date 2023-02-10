@@ -8,7 +8,7 @@ from .base import *
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
-
+ALLOWED_HOSTS = ["*"]
 
 # production settings are specified as environment variables
 SECRET_KEY = getenv("VOTE_SECRET_KEY")
