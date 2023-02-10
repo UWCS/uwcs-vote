@@ -25,4 +25,7 @@ ENV PATH=".venv/bin:$PATH"
 # copy in everything
 COPY . /app
 
+# collect static files
+RUN ["./.venv/bin/python", "manage.py", "collectstatic"]
+
 CMD ["./.venv/bin/gunicorn", "uwcsvote.wsgi",  "-w", "4", "-b", "0.0.0.0:8080"]
