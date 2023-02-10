@@ -34,9 +34,12 @@ typing-extensions = "==3.7.4.3"
 urllib3 = "==1.26.3"
 webencodings = "==0.5.1"
 zipp = "==3.4.0"
+gunicorn = "*"
+dj-database-url = "*"
 
 [dev-packages]
 black = "*"
+isort = "*"
 
 [requires]
 python_version = "3.10"
