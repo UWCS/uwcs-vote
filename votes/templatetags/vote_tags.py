@@ -22,6 +22,6 @@ def sanitized_vote_count(vote: Election):
 @register.simple_tag(takes_context=True)
 def current_user_ticket(context, election: Election):
     try:
-        return election.ticket_set.filter(member=context['user'].member).first()
+        return election.ticket_set.filter(member=context["user"].member).first()
     except AttributeError:
         return None

@@ -1,11 +1,12 @@
 from collections import defaultdict
 
 import django.db.utils
-from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth.models import Permission
+from django.contrib.contenttypes.models import ContentType
 from django.db import models
 
 from uwcsvote.utils import PermsError
+
 
 class Permissions:
     _instance = None

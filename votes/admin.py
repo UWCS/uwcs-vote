@@ -1,17 +1,19 @@
 from django.contrib import admin
 
-from .models import Election, Candidate, Ticket, FPTPVote, APRVVote, STVVote, STVPreference, STVResult
+from .models import (APRVVote, Candidate, Election, FPTPVote, STVPreference,
+                     STVResult, STVVote, Ticket)
 
 
 def archive(modeladmin, request, queryset):
     queryset.filter(open=False).update(archived=True)
+
 
 archive.short_description = "Archive selected elections (if closed)"
 
 
 class PreferenceInline(admin.StackedInline):
     model = STVPreference
-    readonly_fields = ['order', 'candidate']
+    readonly_fields = ["order", "candidate"]
     can_delete = False
     extra = 0
 
@@ -22,29 +24,29 @@ class CandidateInline(admin.StackedInline):
 
 
 class FPTPVoteAdmin(admin.ModelAdmin):
-    readonly_fields = ['election', 'uuid', 'time', 'selection']
-    search_fields = ['uuid']
+    readonly_fields = ["election", "uuid", "time", "selection"]
+    search_fields = ["uuid"]
 
 
 class TicketAdmin(admin.ModelAdmin):
-    search_fields = ['uuid']
+    search_fields = ["uuid"]
 
 
 class STVVoteAdmin(admin.ModelAdmin):
     inlines = [PreferenceInline]
-    readonly_fields = ['election', 'uuid', 'time', 'selection']
-    search_fields = ['uuid']
+    readonly_fields = ["election", "uuid", "time", "selection"]
+    search_fields = ["uuid"]
 
 
 class STVResultAdmin(admin.ModelAdmin):
-    readonly_fields = ['election', 'full_log', 'winners', 'generated']
+    readonly_fields = ["election", "full_log", "winners", "generated"]
 
 
 class ElectionAdmin(admin.ModelAdmin):
     inlines = [CandidateInline]
     actions = [archive]
-    list_filter = ['archived','open', 'vote_type']
-    list_display = ['__str__', 'open','vote_type']
+    list_filter = ["archived", "open", "vote_type"]
+    list_display = ["__str__", "open", "vote_type"]
 
 
 # Register your models here.

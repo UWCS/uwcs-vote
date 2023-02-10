@@ -10,9 +10,7 @@ class WarwickGGUserInline(admin.StackedInline):
 
 
 class WarwickGGUserAdmin(BaseUserAdmin):
-    inlines = [
-        WarwickGGUserInline
-    ]
+    inlines = [WarwickGGUserInline]
 
     def nickname(self, obj):
         return WarwickVoteUser.objects.get(user=obj).nickname
@@ -21,8 +19,21 @@ class WarwickGGUserAdmin(BaseUserAdmin):
         return WarwickVoteUser.objects.get(user=obj).uni_id
 
 
-WarwickGGUserAdmin.list_display = ('uni_id', 'nickname', 'email', 'first_name', 'last_name', 'is_staff')
-WarwickGGUserAdmin.search_fields = ('warwickgguser__uni_id', 'warwickgguser__nickname', 'first_name', 'last_name', 'email')
+WarwickGGUserAdmin.list_display = (
+    "uni_id",
+    "nickname",
+    "email",
+    "first_name",
+    "last_name",
+    "is_staff",
+)
+WarwickGGUserAdmin.search_fields = (
+    "warwickgguser__uni_id",
+    "warwickgguser__nickname",
+    "first_name",
+    "last_name",
+    "email",
+)
 
 admin.site.unregister(get_user_model())
 admin.site.register(get_user_model(), WarwickGGUserAdmin)

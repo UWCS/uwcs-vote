@@ -1,4 +1,5 @@
 import uuid as uuid
+
 from django.db import models
 
 
@@ -12,10 +13,13 @@ class Election(models.Model):
     name = models.CharField(max_length=50)
     description = models.TextField()
     vote_type = models.IntegerField(choices=Types.choices, default=Types.FPTP)
-    max_votes = models.IntegerField(default=2,
-                                    help_text="Ignored except in Plurality. Number of candidates selectable per vote")
+    max_votes = models.IntegerField(
+        default=2,
+        help_text="Ignored except in Plurality. Number of candidates selectable per vote",
+    )
     seats = models.IntegerField(
-        default=1, help_text="Ignored except in STV. Number of people who can win")
+        default=1, help_text="Ignored except in STV. Number of people who can win"
+    )
     open = models.BooleanField(default=False)
     archived = models.BooleanField(default=False)
 
@@ -33,7 +37,7 @@ class Election(models.Model):
             raise NotImplemented()
 
     class Meta:
-        ordering = ('id',)
+        ordering = ("id",)
 
 
 class Candidate(models.Model):
@@ -66,7 +70,7 @@ class Ticket(models.Model):
         return str(self.uuid)
 
     class Meta:
-        unique_together = (('member', 'election'),)
+        unique_together = (("member", "election"),)
 
 
 class Vote(models.Model):
@@ -90,7 +94,7 @@ class APRVVote(Vote):
 
 
 class STVVote(Vote):
-    selection = models.ManyToManyField(Candidate, through='STVPreference')
+    selection = models.ManyToManyField(Candidate, through="STVPreference")
 
 
 class STVPreference(models.Model):
@@ -99,7 +103,7 @@ class STVPreference(models.Model):
     candidate = models.ForeignKey(Candidate, on_delete=models.CASCADE)
 
     class Meta:
-        ordering = ['order']
+        ordering = ["order"]
 
 
 class STVResult(models.Model):

@@ -2,32 +2,31 @@ from itertools import chain
 
 import requests
 from allauth.socialaccount.models import SocialAccount
-from allauth.socialaccount.providers.oauth2.views import (
-    OAuth2Adapter,
-    OAuth2CallbackView,
-    OAuth2LoginView,
-)
+from allauth.socialaccount.providers.oauth2.views import (OAuth2Adapter,
+                                                          OAuth2CallbackView,
+                                                          OAuth2LoginView)
+from django.contrib.auth import logout
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import JsonResponse
-from django.shortcuts import render, redirect
+from django.shortcuts import redirect, render
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import csrf_protect
 
-from uwcs_auth.forms import UserForm, ProfileForm, DeleteUserForm
+from uwcs_auth.forms import DeleteUserForm, ProfileForm, UserForm
 from uwcs_auth.models import WarwickVoteUser
 from uwcs_auth.provider import UWCSProvider
 
-from django.contrib.auth import logout
-
 
 class UserProfileView(LoginRequiredMixin, View):
-    template_name = 'uwcs_auth/me.html'
-    login_url = '/accounts/login/'
+    template_name = "uwcs_auth/me.html"
+    login_url = "/accounts/login/"
 
     def get(self, request):
         user_form = UserForm(instance=request.user)
-        profile_form = ProfileForm(instance=WarwickVoteUser.objects.get(user=request.user))
+        profile_form = ProfileForm(
+            instance=WarwickVoteUser.objects.get(user=request.user)
+        )
 
         try:
             social_user = SocialAccount.objects.get(user=request.user)
@@ -37,56 +36,56 @@ class UserProfileView(LoginRequiredMixin, View):
         uni_id = profile_form.instance.uni_id
 
         context = {
-            'user_form': user_form,
-            'profile_form': profile_form,
-            'social_account': social_user,
-            'uni_id': uni_id,
+            "user_form": user_form,
+            "profile_form": profile_form,
+            "social_account": social_user,
+            "uni_id": uni_id,
         }
 
         return render(request, self.template_name, context=context)
 
-    @method_decorator(csrf_protect, name='dispatch')
+    @method_decorator(csrf_protect, name="dispatch")
     def post(self, request):
         user_form = UserForm(request.POST, instance=request.user)
-        profile_form = ProfileForm(request.POST, instance=WarwickVoteUser.objects.get(user=request.user))
+        profile_form = ProfileForm(
+            request.POST, instance=WarwickVoteUser.objects.get(user=request.user)
+        )
 
         if user_form.is_valid() and profile_form.is_valid():
             user_form.save()
             profile_form.save()
 
             ctx = {
-                'success': True,
-                'values': {
-                    'nickname': profile_form.instance.nickname,
-                    'first_name': user_form.instance.first_name,
-                    'last_name': user_form.instance.last_name,
-                    'email': user_form.instance.email
-                }
+                "success": True,
+                "values": {
+                    "nickname": profile_form.instance.nickname,
+                    "first_name": user_form.instance.first_name,
+                    "last_name": user_form.instance.last_name,
+                    "email": user_form.instance.email,
+                },
             }
             return JsonResponse(ctx, status=200)
         else:
             errors = dict(chain(user_form.errors.items(), profile_form.errors.items()))
-            ctx = {'success': False}
+            ctx = {"success": False}
             if errors:
-                ctx['errors'] = errors
+                ctx["errors"] = errors
 
             return JsonResponse(ctx, status=400)
 
 
 class UserDeleteView(LoginRequiredMixin, View):
-    template_name = 'uwcs_auth/delete_account.html'
-    login_url = '/accounts/login/'
+    template_name = "uwcs_auth/delete_account.html"
+    login_url = "/accounts/login/"
 
     def get(self, request):
         user_form = DeleteUserForm(instance=request.user)
 
-        ctx = {
-            'user_form': user_form
-        }
+        ctx = {"user_form": user_form}
 
         return render(request, self.template_name, context=ctx)
 
-    @method_decorator(csrf_protect, name='dispatch')
+    @method_decorator(csrf_protect, name="dispatch")
     def post(self, request):
         user_form = DeleteUserForm(request.POST, instance=request.user)
 
@@ -95,19 +94,19 @@ class UserDeleteView(LoginRequiredMixin, View):
             logout(request)
             user.delete()
 
-            return redirect('/')
+            return redirect("/")
 
 
 class UWCSOauth2Adapter(OAuth2Adapter):
     provider_id = UWCSProvider.id
-    access_token_url = 'https://uwcs.co.uk/o/token/'
-    authorize_url = 'https://uwcs.co.uk/o/authorize/'
-    profile_url = 'https://uwcs.co.uk/api/me'
+    access_token_url = "https://uwcs.co.uk/o/token/"
+    authorize_url = "https://uwcs.co.uk/o/authorize/"
+    profile_url = "https://uwcs.co.uk/api/me"
 
     def complete_login(self, request, app, access_token, **kwargs):
         headers = {
-            'Authorization': 'Bearer {0}'.format(access_token.token),
-            'Content-Type': 'application/json',
+            "Authorization": "Bearer {0}".format(access_token.token),
+            "Content-Type": "application/json",
         }
         extra_data = requests.get(self.profile_url, headers=headers)
 

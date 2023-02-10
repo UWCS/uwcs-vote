@@ -1,7 +1,7 @@
-from django.views.decorators.csrf import csrf_exempt
-from django.views.generic import View, TemplateView
-from django.utils.decorators import method_decorator
 from django.shortcuts import render
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
+from django.views.generic import TemplateView, View
 
 
 # Create your views here.
@@ -10,7 +10,7 @@ class MarkdownPreview(View):
 
     @method_decorator(csrf_exempt)
     def post(self, request, *args, **kwargs):
-        return render(request, self.template_name, {'body': request.POST['md'].strip()})
+        return render(request, self.template_name, {"body": request.POST["md"].strip()})
 
 
 # Create your views here.
@@ -19,7 +19,7 @@ class MarkdownPreviewSafe(View):
 
     @method_decorator(csrf_exempt)
     def post(self, request, *args, **kwargs):
-        return render(request, self.template_name, {'body': request.POST['md'].strip()})
+        return render(request, self.template_name, {"body": request.POST["md"].strip()})
 
 
 class MarkdownPreviewNewsletter(View):
@@ -27,7 +27,7 @@ class MarkdownPreviewNewsletter(View):
 
     @method_decorator(csrf_exempt)
     def post(self, request, *args, **kwargs):
-        return render(request, self.template_name, {'body': request.POST['md'].strip()})
+        return render(request, self.template_name, {"body": request.POST["md"].strip()})
 
 
 class MarkdownPreviewText(View):
@@ -35,8 +35,8 @@ class MarkdownPreviewText(View):
 
     @method_decorator(csrf_exempt)
     def post(self, request, *args, **kwargs):
-        return render(request, self.template_name, {'body': request.POST['md'].strip()})
+        return render(request, self.template_name, {"body": request.POST["md"].strip()})
 
 
 class HomePage(TemplateView):
-    template_name="home.html"
+    template_name = "home.html"
