@@ -1,11 +1,28 @@
 from django.urls import path
 
-from .views import (AdminView, ApprovalResultView, ApprovalVoteView,
-                    CloseElectionView, CreateCandidate, CreateElection,
-                    DeleteTicketView, DoneView, FPTPResultView, FPTPVoteView,
-                    HomeView, IDTicketView, ResetVoteView, ResultView,
-                    STVAllVoteView, STVResultView, STVVoteView, TicketView,
-                    UpdateCandidate, UpdateElection, VoteView)
+from .views import (
+    AdminView,
+    ApprovalResultView,
+    ApprovalVoteView,
+    CloseElectionView,
+    CreateCandidate,
+    CreateElection,
+    DeleteTicketView,
+    DoneView,
+    FPTPResultView,
+    FPTPVoteView,
+    HomeView,
+    IDTicketView,
+    ResetVoteView,
+    ResultView,
+    STVAllVoteView,
+    STVResultView,
+    STVVoteView,
+    TicketView,
+    UpdateCandidate,
+    UpdateElection,
+    VoteView,
+)
 
 app_name = "votes"
 

@@ -1,26 +1,56 @@
 import random
 from operator import attrgetter, itemgetter
 
-from django.contrib.auth.mixins import (LoginRequiredMixin,
-                                        PermissionRequiredMixin,
-                                        UserPassesTestMixin)
+from django.contrib.auth.mixins import (
+    LoginRequiredMixin,
+    PermissionRequiredMixin,
+    UserPassesTestMixin,
+)
 from django.contrib.messages import add_message
 from django.contrib.messages import constants as messages
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import DatabaseError, transaction
 from django.db.models import Count, Q
-from django.shortcuts import (Http404, HttpResponseRedirect, get_object_or_404,
-                              render, reverse)
+from django.shortcuts import (
+    Http404,
+    HttpResponseRedirect,
+    get_object_or_404,
+    render,
+    reverse,
+)
 from django.urls import reverse_lazy
-from django.views.generic import (CreateView, DetailView, FormView, ListView,
-                                  RedirectView, TemplateView, UpdateView, View)
+from django.views.generic import (
+    CreateView,
+    DetailView,
+    FormView,
+    ListView,
+    RedirectView,
+    TemplateView,
+    UpdateView,
+    View,
+)
 
 from uwcsvote.permissions import PERMS
 
-from .forms import (CandidateForm, DeleteTicketForm, ElectionForm,
-                    IDTicketForm, NullForm, ResetVoteForm)
-from .models import (APRVVote, Candidate, Election, FPTPVote, STVPreference,
-                     STVResult, STVVote, Ticket, Vote)
+from .forms import (
+    CandidateForm,
+    DeleteTicketForm,
+    ElectionForm,
+    IDTicketForm,
+    NullForm,
+    ResetVoteForm,
+)
+from .models import (
+    APRVVote,
+    Candidate,
+    Election,
+    FPTPVote,
+    STVPreference,
+    STVResult,
+    STVVote,
+    Ticket,
+    Vote,
+)
 from .stv import Election as StvCalculator
 
 

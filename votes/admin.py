@@ -1,7 +1,15 @@
 from django.contrib import admin
 
-from .models import (APRVVote, Candidate, Election, FPTPVote, STVPreference,
-                     STVResult, STVVote, Ticket)
+from .models import (
+    APRVVote,
+    Candidate,
+    Election,
+    FPTPVote,
+    STVPreference,
+    STVResult,
+    STVVote,
+    Ticket,
+)
 
 
 def archive(modeladmin, request, queryset):

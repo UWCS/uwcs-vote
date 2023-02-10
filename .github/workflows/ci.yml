@@ -23,8 +23,8 @@ jobs:
           pipenv install --dev --deploy
       - name: Check formatting with isort and black
         run: |
-          pipenv run isort --check-only --skip __tests__ .
-          pipenv run black --check --exclude __tests__ .
+          pipenv run black --check .
+          pipenv run isort --check-only --profile black .
 
   build-and-push-image:
     name: Build and Push Docker Image

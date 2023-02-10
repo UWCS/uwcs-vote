@@ -1,6 +1,12 @@
 from django.core.exceptions import ValidationError
-from django.forms import (CharField, Form, ModelForm, ModelMultipleChoiceField,
-                          Textarea, UUIDField)
+from django.forms import (
+    CharField,
+    Form,
+    ModelForm,
+    ModelMultipleChoiceField,
+    Textarea,
+    UUIDField,
+)
 from django.urls import reverse_lazy
 
 from .models import Candidate, Election, Ticket
