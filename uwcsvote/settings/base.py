@@ -29,6 +29,7 @@ INSTALLED_APPS = [
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
+    "uwcs_auth",
     "crispy_forms",
     "django.contrib.sites",
     "django.contrib.admin",
