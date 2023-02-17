@@ -97,10 +97,7 @@ SOCIALACCOUNT_ADAPTER = "uwcs_auth.adapter.UWCSUserAccountAdapter"
 
 LOGIN_REDIRECT_URL = "/votes/"
 SOCIALACCOUNT_PROVIDERS = {
-    'keycloak': {
-        'KEYCLOAK_URL': 'https://auth.uwcs.co.uk/',
-        'KEYCLOAK_REALM': 'uwcs'
-    }
+    "keycloak": {"KEYCLOAK_URL": "https://auth.uwcs.co.uk", "KEYCLOAK_REALM": "uwcs"}
 }
 
 WSGI_APPLICATION = "uwcsvote.wsgi.application"
