@@ -17,15 +17,15 @@ class WarwickVoteUserAccountAdapter(DefaultAccountAdapter):
         user = super(WarwickVoteUserAccountAdapter, self).save_user(
             request, user, form, commit=False
         )
-        user.first_name = form.cleaned_data.get("first_name")
-        user.last_name = form.cleaned_data.get("last_name")
+        user.first_name = form.cleaned_data.get("given_name")
+        user.last_name = form.cleaned_data.get("family_name")
         user.save()
 
         # Create the associated profile model
         user_profile = WarwickVoteUser(
             user=user,
             uni_id=form.cleaned_data.get("uni_id"),
-            nickname=form.cleaned_data.get("nickname"),
+            nickname=form.cleaned_data.get("preferred_username"),
         )
         user_profile.save()
 
@@ -36,10 +36,10 @@ class UWCSUserAccountAdapter(DefaultSocialAccountAdapter):
 
         initial = {
             "email": user_email(user) or "",
-            "uni_id": sociallogin.account.extra_data.get("user").get("username") or "",
-            "nickname": sociallogin.account.extra_data.get("nickname") or "",
-            "first_name": user_field(user, "first_name") or "",
-            "last_name": user_field(user, "last_name") or "",
+            "uni_id": sociallogin.account.extra_data.get("uni_id", ""),
+            "nickname": sociallogin.account.extra_data.get("preferred_username", ""),
+            "first_name": user_field(user, "given_name") or "",
+            "last_name": user_field(user, "family_name") or "",
         }
 
         return initial

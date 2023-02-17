@@ -29,7 +29,6 @@ INSTALLED_APPS = [
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
-    "allauth.socialaccount.providers.keycloak",
     "crispy_forms",
     "django.contrib.sites",
     "django.contrib.admin",
@@ -96,9 +95,6 @@ ACCOUNT_ADAPTER = "uwcs_auth.adapter.WarwickVoteUserAccountAdapter"
 SOCIALACCOUNT_ADAPTER = "uwcs_auth.adapter.UWCSUserAccountAdapter"
 
 LOGIN_REDIRECT_URL = "/votes/"
-SOCIALACCOUNT_PROVIDERS = {
-    "keycloak": {"KEYCLOAK_URL": "https://auth.uwcs.co.uk", "KEYCLOAK_REALM": "uwcs"}
-}
 
 WSGI_APPLICATION = "uwcsvote.wsgi.application"
 
