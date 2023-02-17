@@ -17,6 +17,7 @@ class WarwickVoteUserAccountAdapter(DefaultAccountAdapter):
         user = super(WarwickVoteUserAccountAdapter, self).save_user(
             request, user, form, commit=False
         )
+        user.username = form.cleaned_data.get("email")
         user.first_name = form.cleaned_data.get("given_name")
         user.last_name = form.cleaned_data.get("family_name")
         user.save()
@@ -35,6 +36,7 @@ class UWCSUserAccountAdapter(DefaultSocialAccountAdapter):
         user = sociallogin.user
 
         initial = {
+            "username": user_email(user) or "",
             "email": user_email(user) or "",
             "uni_id": sociallogin.account.extra_data.get("uni_id", ""),
             "nickname": sociallogin.account.extra_data.get("preferred_username", ""),
@@ -53,6 +55,6 @@ class UWCSUserAccountAdapter(DefaultSocialAccountAdapter):
         user_profile = WarwickVoteUser(
             user=user,
             uni_id=initial.get("uni_id"),
-            nickname=initial.get("preferred_username"),
+            nickname=initial.get("nickname"),
         )
         user_profile.save()

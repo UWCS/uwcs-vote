@@ -5,7 +5,7 @@ from allauth.socialaccount.providers.oauth2.provider import OAuth2Provider
 class UWCSAccount(ProviderAccount):
     def to_str(self):
         dflt = super(UWCSAccount, self).to_str()
-        return self.account.extra_data.get("nickname", dflt)
+        return self.account.extra_data.get("preferred_username", dflt)
 
 
 class UWCSProvider(OAuth2Provider):
