@@ -17,13 +17,12 @@ class UWCSProvider(OAuth2Provider):
         return data["sub"]
 
     def extract_common_fields(self, data):
-        user = data["user"]
         return dict(
-            uni_id=user.get("uni_id"),
-            email=user.get("email"),
+            uni_id=data.get("uni_id"),
+            email=data.get("email"),
             nickname=data.get("preferred_username"),
-            first_name=user.get("given_name"),
-            last_name=user.get("family_name"),
+            first_name=data.get("given_name"),
+            last_name=data.get("family_name"),
         )
 
     def get_default_scope(self):
