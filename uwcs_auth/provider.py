@@ -27,7 +27,7 @@ class UWCSProvider(OAuth2Provider):
         )
 
     def get_default_scope(self):
-        return ["lanapp"]
+        return ["profile", "email", "openid"]
 
 
 provider_classes = [UWCSProvider]
