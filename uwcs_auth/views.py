@@ -115,7 +115,6 @@ class UWCSOauth2Adapter(OAuth2Adapter):
             "Content-Type": "application/json",
         }
         extra_data = requests.get(self.profile_url, headers=headers)
-        print(extra_data.json())
 
         return self.get_provider().sociallogin_from_response(request, extra_data.json())
 

@@ -51,6 +51,8 @@ class UWCSUserAccountAdapter(DefaultSocialAccountAdapter):
 
         # Create the associated profile model
         user_profile = WarwickVoteUser(
-            user=user, uni_id=initial.get("uni_id"), nickname=initial.get("nickname")
+            user=user,
+            uni_id=initial.get("uni_id"),
+            nickname=initial.get("preferred_username"),
         )
         user_profile.save()
