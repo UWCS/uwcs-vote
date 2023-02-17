@@ -101,9 +101,13 @@ class UserDeleteView(LoginRequiredMixin, View):
 
 class UWCSOauth2Adapter(OAuth2Adapter):
     provider_id = UWCSProvider.id
-    access_token_url = "https://auth.uwcs.co.uk/realms/uwcs/protocol/openid-connect/token/"
+    access_token_url = (
+        "https://auth.uwcs.co.uk/realms/uwcs/protocol/openid-connect/token/"
+    )
     authorize_url = "https://auth.uwcs.co.uk/realms/uwcs/protocol/openid-connect/auth/"
-    profile_url = "https://auth.uwcs.co.uk/realms/uwcs/protocol/openid-connect/userinfo/"
+    profile_url = (
+        "https://auth.uwcs.co.uk/realms/uwcs/protocol/openid-connect/userinfo/"
+    )
 
     def complete_login(self, request, app, access_token, **kwargs):
         headers = {
@@ -111,7 +115,7 @@ class UWCSOauth2Adapter(OAuth2Adapter):
             "Content-Type": "application/json",
         }
         extra_data = requests.get(self.profile_url, headers=headers)
-        print(extra_data.json()
+        print(extra_data.json())
 
         return self.get_provider().sociallogin_from_response(request, extra_data.json())
 
