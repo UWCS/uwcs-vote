@@ -26,8 +26,7 @@
         {% for election in object_list %}
             {% current_user_ticket election as ticket %}
             {% if ticket.spent %}
-                <p href="{% url "votes:vote" election.id %}"
-                   class="list-group-item list-group-item-light" data-toggle="tooltip" data-placement="top" title="Already Voted">
+                <p class="list-group-item list-group-item-light" data-toggle="tooltip" data-placement="top" title="Already Voted">
                     <i class="fas fa-vote-yea fa-fw"></i> {{ election.name }}
                 </p>
             {% else %}
