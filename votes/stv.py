@@ -1,4 +1,5 @@
 import secrets
+from copy import deepcopy
 from enum import Enum
 from fractions import Fraction
 from operator import attrgetter, itemgetter
@@ -70,6 +71,7 @@ class Election:
         self.seats = seats
         self.rounds = 0
         self.fulllog = []
+        self.actlog = []
         print(candidates, votes, seats)
         # Huge initial value
         # (surplus should never be this high in our situation (its more votes than there are people in the world))
@@ -131,7 +133,7 @@ class Election:
         # B2e
         if elected:
             self.previous_surplus = surplus
-            self._log(scores, wastage)
+            self._log(scores, wastage, quota)
             return
 
         if surplus == 0 or surplus >= self.previous_surplus:
@@ -154,7 +156,7 @@ class Election:
                         candidate.keep_factor * quota, scores[candidate]
                     )
         self.previous_surplus = surplus
-        self._log(scores, wastage)
+        self._log(scores, wastage, quota)
 
     def _choose(self, candidates):
         if len(candidates) > 1:
@@ -162,40 +164,53 @@ class Election:
             self._addlog("-Tiebreak-")
             self._addlog(a)
             self._addlog()
+            self._addaction("tiebreak", {'round':self.rounds, 'candidates':[str(candidate[0].id) for candidate in candidates], 'choice': str(a.id)})
         else:
             a = candidates[0][0]
         return a
+
+    def _addaction(self, type, details):
+        self.actlog.append({'type':type, 'details':details})
 
     def _addlog(self, *args):
         string = " ".join(map(str, args))
         self.fulllog.append(string)
         print(string)
 
-    def _log(self, scores, wastage):
+    def _log(self, scores, wastage, quota):
         self._addlog(self.rounds)
         self._addlog("======")
+        candstates = {}
         for i in self.candidates:
             assert isinstance(i, Candidate)
             self._addlog("Candidate:", i.id, i.keep_factor.limit_denominator(1000))
             self._addlog("Status:", str(i.status))
             self._addlog("Votes:", str(scores[i].limit_denominator(1000)))
             self._addlog()
+            candstates[str(i.id)] = {"keep_factor":float(i.keep_factor.limit_denominator(1000)), 'status': str(i.status), 'votes':float(scores[i].limit_denominator(1000))}
         self._addlog("Wastage:", str(wastage.limit_denominator(1000)))
+        self._addlog("Threshold:", str(quota.limit_denominator(1000)))
         self._addlog()
+        self._addaction("round", {'round':self.rounds, 'candidates':candstates, 'wastage': float(wastage.limit_denominator(1000)), 'threshold': float(quota.limit_denominator(1000))})
 
     def _report(self):
         self._addlog("**Election Results**")
         self._addlog()
+        candstates = {"ELECTED": [], "DEFEATED":[], "WITHDRAWN":[]}
         self._addlog("ELECTED")
         for i in filter(lambda x: x.status == States.ELECTED, self.candidates):
             self._addlog(" Candidate", i.id)
+            candstates["ELECTED"].append(str(i.id))
         self._addlog("DEFEATED")
         for i in filter(lambda x: x.status == States.DEFEATED, self.candidates):
             self._addlog(" Candidate", i.id)
+            candstates["DEFEATED"].append(str(i.id))
         self._addlog("WITHDRAWN")
         for i in filter(lambda x: x.status == States.WITHDRAWN, self.candidates):
             self._addlog(" Candidate", i.id)
+            candstates["WITHDRAWN"].append(str(i.id))
         self._addlog()
+        self._addaction("report", candstates)
 
     def full_election(self):
         try:
