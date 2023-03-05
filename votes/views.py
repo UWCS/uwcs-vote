@@ -489,7 +489,6 @@ class STVResultView(PermissionRequiredMixin, ListView):
             calc = StvCalculator(candidates, votes, self.election.seats)
             calc.withdraw(withdrawn)
             calc.full_election()
-            print(calc.actlog)
             res = STVResult.objects.create(
                 election=self.election, full_log="\n".join(calc.fulllog), action_log=calc.actlog
             )
