@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('votes', '0003_election_archived'),
+        ("votes", "0003_election_archived"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='stvresult',
-            name='action_log',
+            model_name="stvresult",
+            name="action_log",
             field=models.JSONField(blank=True, null=True),
         ),
     ]

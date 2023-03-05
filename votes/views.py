@@ -490,7 +490,9 @@ class STVResultView(PermissionRequiredMixin, ListView):
             calc.withdraw(withdrawn)
             calc.full_election()
             res = STVResult.objects.create(
-                election=self.election, full_log="\n".join(calc.fulllog), action_log=calc.actlog
+                election=self.election,
+                full_log="\n".join(calc.fulllog),
+                action_log=calc.actlog,
             )
             res.save()
             res.winners.add(*Candidate.objects.filter(id__in=calc.winners()))

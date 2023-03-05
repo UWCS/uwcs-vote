@@ -169,15 +169,20 @@ class Election:
             self._addlog("-Tiebreak-")
             self._addlog(a)
             self._addlog()
-            self._addaction("tiebreak",
-                            {'round': self.rounds, 'candidates': [str(candidate[0].id) for candidate in candidates],
-                             'choice': str(a.id)})
+            self._addaction(
+                "tiebreak",
+                {
+                    "round": self.rounds,
+                    "candidates": [str(candidate[0].id) for candidate in candidates],
+                    "choice": str(a.id),
+                },
+            )
         else:
             a = candidates[0][0]
         return a
 
     def _addaction(self, type, details):
-        self.actlog.append({'type': type, 'details': details})
+        self.actlog.append({"type": type, "details": details})
 
     def _addlog(self, *args):
         string = " ".join(map(str, args))
@@ -194,15 +199,24 @@ class Election:
             self._addlog("Status:", str(i.status))
             self._addlog("Votes:", str(scores[i].limit_denominator(1000)))
             self._addlog()
-            candstates[str(i.id)] = {"keep_factor": float(i.keep_factor.limit_denominator(1000)),
-                                     'status': str(i.status), 'votes': float(scores[i].limit_denominator(1000))}
+            candstates[str(i.id)] = {
+                "keep_factor": float(i.keep_factor.limit_denominator(1000)),
+                "status": str(i.status),
+                "votes": float(scores[i].limit_denominator(1000)),
+            }
         self._addlog("Wastage:", str(wastage.limit_denominator(1000)))
         self._addlog("Threshold:", str(quota.limit_denominator(1000)))
         self._addlog()
 
-        self._addaction("round", {'round': self.rounds, 'candidates': candstates,
-                                  'wastage': float(wastage.limit_denominator(1000)),
-                                  'threshold': float(quota.limit_denominator(1000))})
+        self._addaction(
+            "round",
+            {
+                "round": self.rounds,
+                "candidates": candstates,
+                "wastage": float(wastage.limit_denominator(1000)),
+                "threshold": float(quota.limit_denominator(1000)),
+            },
+        )
 
     def _report(self):
         self._addlog("**Election Results**")
@@ -299,10 +313,10 @@ def two_available_three():
 def two_available_four():
     c = {1, 2, 3, 4}
     v = (
-            [(4, 2, 1, 3)] * 4
-            + [(3, 2, 4, 1)] * 5
-            + [(2, 1, 4, 3)] * 3
-            + [(1, 4, 2, 3)] * 2
+        [(4, 2, 1, 3)] * 4
+        + [(3, 2, 4, 1)] * 5
+        + [(2, 1, 4, 3)] * 3
+        + [(1, 4, 2, 3)] * 2
     )
     e = Election(c, v, 2)
     e.full_election()
