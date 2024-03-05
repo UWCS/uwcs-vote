@@ -256,7 +256,9 @@ class Election:
             pass
 
     def winners(self):
-        return list(map(
-            attrgetter("id"),
-            filter(lambda x: x.status == States.ELECTED, self.candidates),
-        ))
+        return list(
+            map(
+                attrgetter("id"),
+                filter(lambda x: x.status == States.ELECTED, self.candidates),
+            )
+        )

@@ -59,19 +59,19 @@ def test_two_available_three():
 def test_corner_case():
     c = {1, 2, 3, 4, 5, 6, 7, 8}
     v = (
-        [(1, 2, 3, 4, 5, 6, 7, 8)] +
-        [(3, 4, 5, 6, 7, 8, 1, 2)] * 36 +
-        [(4, 5, 6, 7, 8, 1, 2, 3)] * 6 +
-        [(5, 6, 7, 8, 1, 2, 3, 4)] * 13 +
-        [(6, 7, 8, 1, 2, 3, 4, 5)] * 4 +
-        [(7, 8, 1, 2, 3, 4, 5, 6)] * 2 +
-        [(8, 1, 2, 3, 4, 5, 6, 7)] * 4
+        [(1, 2, 3, 4, 5, 6, 7, 8)]
+        + [(3, 4, 5, 6, 7, 8, 1, 2)] * 36
+        + [(4, 5, 6, 7, 8, 1, 2, 3)] * 6
+        + [(5, 6, 7, 8, 1, 2, 3, 4)] * 13
+        + [(6, 7, 8, 1, 2, 3, 4, 5)] * 4
+        + [(7, 8, 1, 2, 3, 4, 5, 6)] * 2
+        + [(8, 1, 2, 3, 4, 5, 6, 7)] * 4
     )
     e = Election(c, v, 2)
     e.full_election()
     # Bug caused the second round to erroneously tiebreak between all people after electing 3.
     # Check this isn't reintroduced
-    assert e.actlog[2]['type'] != "tiebreak"
+    assert e.actlog[2]["type"] != "tiebreak"
     assert sorted(e.winners()) == [3, 5]
 
 
