@@ -149,7 +149,7 @@ class Election:
             )
             min_score = sorted_results[0][1]
             eliminated_candidate: Candidate = self._choose(
-                list(filter(lambda x: x[1] <= min_score + surplus, sorted_results))
+                list(filter(lambda x: x[1] == min_score, sorted_results))
             )
             eliminated_candidate.status = States.DEFEATED
             eliminated_candidate.keep_factor = Fraction(0)
@@ -256,92 +256,9 @@ class Election:
             pass
 
     def winners(self):
-        return map(
-            attrgetter("id"),
-            filter(lambda x: x.status == States.ELECTED, self.candidates),
+        return list(
+            map(
+                attrgetter("id"),
+                filter(lambda x: x.status == States.ELECTED, self.candidates),
+            )
         )
-
-
-def fptp_equivalent():
-    c = {1, 2}
-    v = [(1, 2)] * 9 + [(2, 1)] * 8 + [(2,)] + [(1,)]
-    e = Election(c, v, 1)
-    e.full_election()
-
-
-def immediate_majority():
-    c = {1, 2, 3, 4}
-    v = [(1, 2, 3, 4)] * 9 + [(2, 3, 1, 4)] * 4 + [(3, 1, 4, 2)] * 3 + [(4, 1)] * 2
-    e = Election(c, v, 1)
-    e.full_election()
-
-
-def delayed_majority():
-    c = {1, 2, 3, 4}
-    v = [(4, 2, 1, 3)] * 4 + [(3, 2, 4, 1)] * 4 + [(2, 4, 1, 3)]
-    e = Election(c, v, 1)
-    e.full_election()
-
-
-def delayeder_majority():
-    c = {1, 2, 3, 4}
-    v = [(4, 2, 1, 3)] * 4 + [(3, 2, 4, 1)] * 5 + [(2, 1, 4, 3)] + [(1, 4, 2, 3)]
-    e = Election(c, v, 1)
-    e.full_election()
-
-
-def two_available_three():
-    c = {1, 2, 3}
-    v = [
-        (1, 2, 3),
-        (1, 3, 2),
-        (2,),
-        (3, 1),
-        (3, 1),
-        (1, 2, 3),
-        (2,),
-        (1, 3, 2),
-        (1, 3, 2),
-        (1, 3, 2),
-        (1, 3, 2),
-        (1, 3, 2),
-    ]
-    e = Election(c, v, 2)
-    e.full_election()
-
-
-def two_available_four():
-    c = {1, 2, 3, 4}
-    v = (
-        [(4, 2, 1, 3)] * 4
-        + [(3, 2, 4, 1)] * 5
-        + [(2, 1, 4, 3)] * 3
-        + [(1, 4, 2, 3)] * 2
-    )
-    e = Election(c, v, 2)
-    e.full_election()
-
-
-def tiebreaker():
-    c = {1, 2, 3, 4}
-    v = [(1,), (2,), (3,), (4,)]
-    e = Election(c, v, 1)
-    e.full_election()
-
-
-def malformed():
-    c = {1, 2}
-    v = [(1, 2, 1)] * 10
-    e = Election(c, v, 1)
-    e.full_election()
-
-
-def malformed2():
-    c = {1, 2, 3}
-    v = [(1, 2, 3, 4)] * 10
-    e = Election(c, v, 1)
-    e.full_election()
-
-
-if __name__ == "__main__":
-    delayed_majority()
