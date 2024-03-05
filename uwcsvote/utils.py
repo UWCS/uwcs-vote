@@ -6,4 +6,4 @@ class PermsError:
         cls.val = False
 
     def __bool__(self):
-        return self.val
+        return self.val and False
