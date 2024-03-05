@@ -141,7 +141,7 @@ class Election:
             self._log(scores, wastage, quota)
             return
 
-        if surplus == 0:
+        if surplus == 0 or surplus >= self.previous_surplus:
             # B3
             sorted_results = sorted(
                 filter(lambda x: x[0].status == States.HOPEFUL, scores.items()),
