@@ -41,7 +41,8 @@ def vote_breakdown_table(election: Election):
         detail = i["details"]
         if type_ == "round" and detail["round"] == 0:
             states = {
-                candidate: [detail["candidates"][candidate]["status"]] for candidate in candidates
+                candidate: [detail["candidates"][candidate]["status"]]
+                for candidate in candidates
             }  # States are offset by one round due to r0
     assert states is not None
     wastage = []
@@ -118,7 +119,13 @@ def vote_breakdown_table(election: Election):
         row = []
         key = str(candidate.id)
         row.append((candidate.name, 1, "standard"))
-        row.append((states[key][0], 1, "standard" if states[key][0] != "WITHDRAWN" else "changed"))
+        row.append(
+            (
+                states[key][0],
+                1,
+                "standard" if states[key][0] != "WITHDRAWN" else "changed",
+            )
+        )
         for i in range(rounds):
             row.append((scores[key][i], 1, "float"))
             if tiebreak[i] is not False:
