@@ -1,8 +1,9 @@
 {% extends "votes/approval_results.html" %}
 {% load vote_tags %}
 {% block results %}
-    <h2>Total Turnout: {{ election.stvvote_set.count }}</h2>
-    <h2>Available seats: {{ election.seats }}</h2>
+    <hr>
+    <p>Total Turnout: {{ election.stvvote_set.count }}</p>
+    <p>Available seats: {{ election.seats }}</p>
     <h2>Winner{{ result.winners.all|pluralize }}</h2>
     <div class="list-group mb-3">
         {% for winner in result.winners.all %}

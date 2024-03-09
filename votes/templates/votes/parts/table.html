@@ -22,7 +22,7 @@
                     {% elif style == "changed" %}
                         <td colspan="{{ width }}"><strong>{{ content }}</strong></td>
                     {% elif style == "float" %}
-                        <td colspan="{{ width }}">{{ content|floatformat }}</td>
+                        <td colspan="{{ width }}">{{ content|floatformat:-3 }}</td>
                     {% else %}
                         <td colspan="{{ width }}">{{ content }}</td>
                     {% endif %}
@@ -39,7 +39,7 @@
                     {% elif style == "changed" %}
                         <td colspan="{{ width }}"><strong>{{ content }}</strong></td>
                     {% elif style == "float" %}
-                        <td colspan="{{ width }}">{{ content|floatformat }}</td>
+                        <td colspan="{{ width }}">{{ content|floatformat:-3 }}</td>
                     {% else %}
                         <td colspan="{{ width }}">{{ content }}</td>
                     {% endif %}
