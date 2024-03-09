@@ -35,9 +35,15 @@ def vote_breakdown_table(election: Election):
         str(x.id) for x in election.candidate_set.all()
     ]  # JSON keys have to be strings
     scores = {candidate: [] for candidate in candidates}
-    states = {
-        candidate: ["HOPEFUL"] for candidate in candidates
-    }  # States are offset by one round due to r0
+    states = None
+    for i in actions:
+        type_ = i["type"]
+        detail = i["details"]
+        if type_ == "round" and detail["round"] == 0:
+            states = {
+                candidate: [detail["candidates"][candidate]["status"]] for candidate in candidates
+            }  # States are offset by one round due to r0
+    assert states is not None
     wastage = []
     total = []
     threshold = []
@@ -112,14 +118,14 @@ def vote_breakdown_table(election: Election):
         row = []
         key = str(candidate.id)
         row.append((candidate.name, 1, "standard"))
-        row.append((states[key][0], 1, "standard"))
+        row.append((states[key][0], 1, "standard" if states[key][0] != "WITHDRAWN" else "changed"))
         for i in range(rounds):
             row.append((scores[key][i], 1, "float"))
             if tiebreak[i] is not False:
                 if key == tiebreak[i][0]:
                     row.append(
                         (
-                            mark_safe('<i class="fas fa-check-circle"></i>'),
+                            mark_safe('<i class="fas fa-dot-circle"></i>'),
                             1,
                             "standard",
                         )
