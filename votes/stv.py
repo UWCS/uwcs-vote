@@ -1,6 +1,6 @@
 import secrets
+from decimal import ROUND_DOWN, ROUND_UP, Context, Decimal, localcontext
 from enum import Enum
-from decimal import Decimal, Context, localcontext, ROUND_DOWN, ROUND_UP
 from operator import attrgetter, itemgetter
 from typing import Dict, List, Set, Tuple
 
@@ -124,7 +124,11 @@ class Election:
                 wastage += weight
 
             # Check all votes accounted for
-            assert len(self.votes) - self.omega <= wastage + sum(scores.values()) <= len(self.votes) + self.omega
+            assert (
+                len(self.votes) - self.omega
+                <= wastage + sum(scores.values())
+                <= len(self.votes) + self.omega
+            )
 
             # B2b
             quota = sum(scores.values()) / (self.seats + 1) + 0.000000001
@@ -159,7 +163,9 @@ class Election:
                 # B2f
                 for candidate in self.candidates:
                     if candidate.status == States.ELECTED:
-                        candidate.keep_factor = (candidate.keep_factor * quota) / scores[candidate]
+                        candidate.keep_factor = (
+                            candidate.keep_factor * quota
+                        ) / scores[candidate]
             previous_surplus = surplus
 
         # B3
@@ -206,7 +212,7 @@ class Election:
         self._addlog(self.rounds)
         self._addlog("======")
         candstates = {}
-        for i in sorted(self.candidates, key=attrgetter('id')):
+        for i in sorted(self.candidates, key=attrgetter("id")):
             assert isinstance(i, Candidate)
             self._addlog("Candidate:", i.id, i.keep_factor)
             self._addlog("Status:", str(i.status))
