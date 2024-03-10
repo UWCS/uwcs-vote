@@ -8,7 +8,7 @@ from typing import Dict, List, Set, Tuple
 STV calculator
 
 Based on procedure as defined in https://prfound.org/resources/reference/reference-meek-rule/
-Uses exact ratio arithmetic to prevent need to use epsilon float comparisons.
+Uses float arithmetic as exact arithmetic became too expensive.
 Uses a secure random generator to split ties randomly. 
 Unfortunately this is more likely to trigger than I'd prefer due to the small populations and single seats.
 """
