@@ -25,6 +25,8 @@ jobs:
         run: |
           pipenv run black --check .
           pipenv run isort --check-only --profile black .
+      - name: Run STV tests
+        run: pipenv run pytest ./votes/tests
 
   build-and-push-image:
     name: Build and Push Docker Image
