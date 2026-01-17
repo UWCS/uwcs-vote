@@ -11,6 +11,7 @@ import time
 
 logger = logging.getLogger(__name__)
 
+
 def fetch_webgroups(id):
     """
     Fetches the list of webgroups a user ID is in
@@ -23,9 +24,9 @@ def fetch_webgroups(id):
             try:
                 root = ET.fromstring(response.content)
                 groups = [
-                    node.get('name')
-                    for node in root.findall('group')
-                    if node.get('name')
+                    node.get("name")
+                    for node in root.findall("group")
+                    if node.get("name")
                 ]
                 return groups
             except ET.ParseError:
@@ -34,11 +35,12 @@ def fetch_webgroups(id):
         print(f"Unknown exception: {e}")
     return []
 
+
 def sync_uwcs_members():
     """
     Fetches XML from Warwick SU API, syncs to DB.
     """
-    api_key = getattr(settings, 'SU_API_KEY', '')
+    api_key = getattr(settings, "SU_API_KEY", "")
     url = f"https://www.warwicksu.com/membershipapi/listmembers/{api_key}/"
 
     print(f"Fetching members from: {url}")
@@ -53,16 +55,16 @@ def sync_uwcs_members():
             print(f"Failed to parse XML: {e}")
             return
 
-        member_nodes = root.findall('.//Member')
+        member_nodes = root.findall(".//Member")
 
         valid_ids = []
 
         with transaction.atomic():
             for node in member_nodes:
-                uid_node = node.find('UniqueID')
-                fname_node = node.find('FirstName')
-                lname_node = node.find('LastName')
-                email_node = node.find('EmailAddress')
+                uid_node = node.find("UniqueID")
+                fname_node = node.find("FirstName")
+                lname_node = node.find("LastName")
+                email_node = node.find("EmailAddress")
 
                 if uid_node is None or not uid_node.text:
                     continue  # Skip invalid records / associate members
@@ -74,19 +76,31 @@ def sync_uwcs_members():
                 SUMember.objects.update_or_create(
                     uniqueId=uni_id,
                     defaults={
-                        'firstName': fname_node.text.strip() if (fname_node is not None and fname_node.text) else "",
-                        'lastName': lname_node.text.strip() if (lname_node is not None and lname_node.text) else "",
-                        'emailAddress': email_node.text.strip() if (email_node is not None and email_node.text) else "",
-                    }
+                        "firstName": (
+                            fname_node.text.strip()
+                            if (fname_node is not None and fname_node.text)
+                            else ""
+                        ),
+                        "lastName": (
+                            lname_node.text.strip()
+                            if (lname_node is not None and lname_node.text)
+                            else ""
+                        ),
+                        "emailAddress": (
+                            email_node.text.strip()
+                            if (email_node is not None and email_node.text)
+                            else ""
+                        ),
+                    },
                 )
             deleted_count, _ = SUMember.objects.exclude(uniqueId__in=valid_ids).delete()
 
         for new_id in valid_ids:
-            print("Fetching for "+new_id)
+            print("Fetching for " + new_id)
             groups = fetch_webgroups(new_id)
             if groups:
                 SUMember.objects.filter(uniqueId=new_id).update(webgroups=groups)
-            time.sleep(0.1) # don't make IDG want to kill us
+            time.sleep(0.1)  # don't make IDG want to kill us
 
         print(f"Sync Complete. Active: {len(valid_ids)}. Removed: {deleted_count}.")
 

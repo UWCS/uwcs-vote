@@ -6,18 +6,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('votes', '0005_alter_aprvvote_id_alter_candidate_id_and_more'),
+        ("votes", "0005_alter_aprvvote_id_alter_candidate_id_and_more"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='election',
-            name='required_webgroups',
+            model_name="election",
+            name="required_webgroups",
             field=models.JSONField(default=list),
         ),
         migrations.AddField(
-            model_name='election',
-            name='self_id_eligibility_confirmation',
+            model_name="election",
+            name="self_id_eligibility_confirmation",
             field=models.TextField(blank=True),
         ),
     ]

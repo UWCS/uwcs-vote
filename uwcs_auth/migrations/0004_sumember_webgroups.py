@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('uwcs_auth', '0003_sumember_alter_warwickvoteuser_id'),
+        ("uwcs_auth", "0003_sumember_alter_warwickvoteuser_id"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='sumember',
-            name='webgroups',
+            model_name="sumember",
+            name="webgroups",
             field=models.JSONField(blank=True, default=list),
         ),
     ]

@@ -16,11 +16,11 @@ SU_API_KEY = getenv("VOTE_SU_API_KEY")
 db_url = getenv("VOTE_DB_URL")
 
 SOCIALACCOUNT_PROVIDERS = {
-    'uwcs': {
-        'APP': {
-            'client_id': getenv("VOTE_CLIENT_ID"),
-            'secret': getenv("VOTE_CLIENT_SECRET"),
-            'key': ''
+    "uwcs": {
+        "APP": {
+            "client_id": getenv("VOTE_CLIENT_ID"),
+            "secret": getenv("VOTE_CLIENT_SECRET"),
+            "key": "",
         }
     }
 }

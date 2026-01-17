@@ -6,25 +6,35 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('uwcs_auth', '0002_auto_20210218_0036'),
+        ("uwcs_auth", "0002_auto_20210218_0036"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='SUMember',
+            name="SUMember",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('uniqueId', models.CharField(max_length=11, unique=True)),
-                ('firstName', models.CharField(max_length=30)),
-                ('lastName', models.CharField(max_length=30)),
-                ('emailAddress', models.CharField(max_length=60)),
-                ('firstSeen', models.DateTimeField(blank=True, null=True)),
-                ('lastSeen', models.DateTimeField(blank=True, null=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("uniqueId", models.CharField(max_length=11, unique=True)),
+                ("firstName", models.CharField(max_length=30)),
+                ("lastName", models.CharField(max_length=30)),
+                ("emailAddress", models.CharField(max_length=60)),
+                ("firstSeen", models.DateTimeField(blank=True, null=True)),
+                ("lastSeen", models.DateTimeField(blank=True, null=True)),
             ],
         ),
         migrations.AlterField(
-            model_name='warwickvoteuser',
-            name='id',
-            field=models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID'),
+            model_name="warwickvoteuser",
+            name="id",
+            field=models.BigAutoField(
+                auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+            ),
         ),
     ]

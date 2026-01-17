@@ -128,6 +128,7 @@ class IDTicketView(PermissionRequiredMixin, FormView):
                 Ticket.objects.get_or_create(member=uniid, election=election)
         return super().form_valid(form)
 
+
 class DateTicketView(PermissionRequiredMixin, FormView):
     permission_required = PERMS.votes.add_ticket
     form_class = DateTicketForm
@@ -135,7 +136,9 @@ class DateTicketView(PermissionRequiredMixin, FormView):
     success_url = reverse_lazy("votes:admin")
 
     def form_valid(self, form):
-        sumembers = SUMember.objects.filter(firstSeen__lte=form.cleaned_data["bought_membership_before"])
+        sumembers = SUMember.objects.filter(
+            firstSeen__lte=form.cleaned_data["bought_membership_before"]
+        )
         for member in sumembers:
             for election in form.cleaned_data["elections"]:
                 Ticket.objects.get_or_create(member=member.uniqueId, election=election)
@@ -329,10 +332,17 @@ class ApprovalVoteView(UserPassesTestMixin, TemplateView):
             open=True,
             vote_type=Election.Types.APRV,
         )
-        return self.request.user.member.ticket_set.filter(
-            election=self.election, spent=False
-        ).exists() and (su := SUMember.objects.filter(uniqueId=self.request.user.member.uni_id).first()) and set(
-            self.election.required_webgroups or []).issubset(set(su.webgroups))
+        return (
+            self.request.user.member.ticket_set.filter(
+                election=self.election, spent=False
+            ).exists()
+            and (
+                su := SUMember.objects.filter(
+                    uniqueId=self.request.user.member.uni_id
+                ).first()
+            )
+            and set(self.election.required_webgroups or []).issubset(set(su.webgroups))
+        )
 
     def post(self, request, **kwargs):
         self.get_context_data(**kwargs)
@@ -425,10 +435,17 @@ class FPTPVoteView(UserPassesTestMixin, TemplateView):
             open=True,
             vote_type=Election.Types.FPTP,
         )
-        return self.request.user.member.ticket_set.filter(
-            election=self.election, spent=False
-        ).exists() and (su := SUMember.objects.filter(uniqueId=self.request.user.member.uni_id).first()) and set(
-            self.election.required_webgroups or []).issubset(set(su.webgroups))
+        return (
+            self.request.user.member.ticket_set.filter(
+                election=self.election, spent=False
+            ).exists()
+            and (
+                su := SUMember.objects.filter(
+                    uniqueId=self.request.user.member.uni_id
+                ).first()
+            )
+            and set(self.election.required_webgroups or []).issubset(set(su.webgroups))
+        )
 
     def post(self, request, **kwargs):
         self.get_context_data(**kwargs)
@@ -543,10 +560,17 @@ class STVVoteView(UserPassesTestMixin, TemplateView):
             open=True,
             vote_type=Election.Types.STV,
         )
-        return self.request.user.member.ticket_set.filter(
-            election=self.election, spent=False
-        ).exists() and (su := SUMember.objects.filter(uniqueId=self.request.user.member.uni_id).first()) and set(
-            self.election.required_webgroups or []).issubset(set(su.webgroups))
+        return (
+            self.request.user.member.ticket_set.filter(
+                election=self.election, spent=False
+            ).exists()
+            and (
+                su := SUMember.objects.filter(
+                    uniqueId=self.request.user.member.uni_id
+                ).first()
+            )
+            and set(self.election.required_webgroups or []).issubset(set(su.webgroups))
+        )
 
     def post(self, request, **kwargs):
         self.get_context_data(**kwargs)

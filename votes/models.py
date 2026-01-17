@@ -22,8 +22,13 @@ class Election(models.Model):
     )
     open = models.BooleanField(default=False)
     archived = models.BooleanField(default=False)
-    required_webgroups = models.JSONField(default=list, help_text="Required webgroups to be eligible to vote")
-    self_id_eligibility_confirmation = models.TextField(blank=True, help_text="Confirmation text when the vote is restricted, but permits self-ID")
+    required_webgroups = models.JSONField(
+        default=list, help_text="Required webgroups to be eligible to vote"
+    )
+    self_id_eligibility_confirmation = models.TextField(
+        blank=True,
+        help_text="Confirmation text when the vote is restricted, but permits self-ID",
+    )
 
     def __str__(self):
         return self.name

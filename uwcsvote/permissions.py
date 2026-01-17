@@ -63,9 +63,11 @@ class Permissions:
         else:
             return Permissions.AppPermissions()
 
+
 class MockPerms:
     def __getattr__(self, item):
         return self
+
 
 PERMS = MockPerms()
 

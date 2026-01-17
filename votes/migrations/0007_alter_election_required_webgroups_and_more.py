@@ -6,18 +6,23 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('votes', '0006_election_required_webgroups_and_more'),
+        ("votes", "0006_election_required_webgroups_and_more"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='election',
-            name='required_webgroups',
-            field=models.JSONField(default=list, help_text='Required webgroups to be eligible to vote'),
+            model_name="election",
+            name="required_webgroups",
+            field=models.JSONField(
+                default=list, help_text="Required webgroups to be eligible to vote"
+            ),
         ),
         migrations.AlterField(
-            model_name='election',
-            name='self_id_eligibility_confirmation',
-            field=models.TextField(blank=True, help_text='Confirmation text when the vote is restricted, but permits self-ID'),
+            model_name="election",
+            name="self_id_eligibility_confirmation",
+            field=models.TextField(
+                blank=True,
+                help_text="Confirmation text when the vote is restricted, but permits self-ID",
+            ),
         ),
     ]

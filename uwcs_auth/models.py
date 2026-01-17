@@ -41,6 +41,7 @@ class WarwickVoteUser(models.Model):
     def member(self):
         return self
 
+
 class SUMember(models.Model):
     uniqueId = models.CharField(max_length=11, unique=True)
     firstName = models.CharField(max_length=30)

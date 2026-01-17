@@ -9,6 +9,7 @@ https://docs.djangoproject.com/en/2.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/2.0/ref/settings/
 """
+
 import os
 
 import django.contrib.messages.constants as message_constants
@@ -38,7 +39,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "django_apscheduler"
+    "django_apscheduler",
 ]
 
 MIDDLEWARE = [
@@ -129,15 +130,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-SOCIALACCOUNT_PROVIDERS = {
-    'uwcs': {
-        'APP': {
-            'client_id': '',
-            'secret': '',
-            'key': ''
-        }
-    }
-}
+SOCIALACCOUNT_PROVIDERS = {"uwcs": {"APP": {"client_id": "", "secret": "", "key": ""}}}
 
 # Setup Cripsy to render forms bootstrap4ish
 CRISPY_TEMPLATE_PACK = "bootstrap4"

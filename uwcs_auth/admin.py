@@ -38,6 +38,7 @@ WarwickGGUserAdmin.search_fields = (
 admin.site.unregister(get_user_model())
 admin.site.register(get_user_model(), WarwickGGUserAdmin)
 
+
 class SUMemberAdmin(admin.ModelAdmin):
     list_display = (
         "uniqueId",
@@ -46,17 +47,12 @@ class SUMemberAdmin(admin.ModelAdmin):
         "emailAddress",
         "firstSeen",
         "lastSeen",
-        "webgroups"
+        "webgroups",
     )
 
-    search_fields = (
-        "uniqueId",
-        "firstName",
-        "lastName",
-        "emailAddress",
-        "webgroups"
-    )
+    search_fields = ("uniqueId", "firstName", "lastName", "emailAddress", "webgroups")
 
     list_filter = ("firstSeen", "lastSeen")
+
 
 admin.site.register(SUMember, SUMemberAdmin)
