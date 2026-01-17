@@ -31,6 +31,7 @@ from django.views.generic import (
 )
 
 from uwcsvote.permissions import PERMS
+from uwcs_auth.models import SUMember
 
 from .forms import (
     CandidateForm,
@@ -39,6 +40,7 @@ from .forms import (
     IDTicketForm,
     NullForm,
     ResetVoteForm,
+    DateTicketForm,
 )
 from .models import (
     APRVVote,
@@ -62,7 +64,21 @@ class HomeView(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         tickets = self.request.user.member.ticket_set.filter()
-        return Election.objects.filter(ticket__in=tickets, open=True)
+        elections = Election.objects.filter(ticket__in=tickets, open=True)
+        webgroups_allowed_ids = []
+
+        has_webgroups = set()
+        try:
+            su_member = SUMember.objects.get(uniqueId=self.request.user.member.uni_id)
+            has_webgroups = set(su_member.webgroups)
+        except SUMember.DoesNotExist:
+            pass
+        for election in elections:
+            required_webgroups = set(election.required_webgroups or [])
+            if required_webgroups.issubset(has_webgroups):
+                webgroups_allowed_ids.append(election.id)
+
+        return Election.objects.filter(id__in=webgroups_allowed_ids, open=True)
 
     def get_context_data(self, *args, **kwargs):
         ctxt = super().get_context_data(*args, **kwargs)
@@ -110,6 +126,19 @@ class IDTicketView(PermissionRequiredMixin, FormView):
         for uniid in form.cleaned_data["ids"].split():
             for election in form.cleaned_data["elections"]:
                 Ticket.objects.get_or_create(member=uniid, election=election)
+        return super().form_valid(form)
+
+class DateTicketView(PermissionRequiredMixin, FormView):
+    permission_required = PERMS.votes.add_ticket
+    form_class = DateTicketForm
+    template_name = "votes/tickets.html"
+    success_url = reverse_lazy("votes:admin")
+
+    def form_valid(self, form):
+        sumembers = SUMember.objects.filter(firstSeen__lte=form.cleaned_data["bought_membership_before"])
+        for member in sumembers:
+            for election in form.cleaned_data["elections"]:
+                Ticket.objects.get_or_create(member=member.uniqueId, election=election)
         return super().form_valid(form)
 
 
@@ -302,7 +331,8 @@ class ApprovalVoteView(UserPassesTestMixin, TemplateView):
         )
         return self.request.user.member.ticket_set.filter(
             election=self.election, spent=False
-        ).exists()
+        ).exists() and (su := SUMember.objects.filter(uniqueId=self.request.user.member.uni_id).first()) and set(
+            self.election.required_webgroups or []).issubset(set(su.webgroups))
 
     def post(self, request, **kwargs):
         self.get_context_data(**kwargs)
@@ -397,7 +427,8 @@ class FPTPVoteView(UserPassesTestMixin, TemplateView):
         )
         return self.request.user.member.ticket_set.filter(
             election=self.election, spent=False
-        ).exists()
+        ).exists() and (su := SUMember.objects.filter(uniqueId=self.request.user.member.uni_id).first()) and set(
+            self.election.required_webgroups or []).issubset(set(su.webgroups))
 
     def post(self, request, **kwargs):
         self.get_context_data(**kwargs)
@@ -514,7 +545,8 @@ class STVVoteView(UserPassesTestMixin, TemplateView):
         )
         return self.request.user.member.ticket_set.filter(
             election=self.election, spent=False
-        ).exists()
+        ).exists() and (su := SUMember.objects.filter(uniqueId=self.request.user.member.uni_id).first()) and set(
+            self.election.required_webgroups or []).issubset(set(su.webgroups))
 
     def post(self, request, **kwargs):
         self.get_context_data(**kwargs)

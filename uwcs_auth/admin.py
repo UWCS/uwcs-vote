@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 
-from .models import WarwickVoteUser
+from .models import WarwickVoteUser, SUMember
 
 
 class WarwickGGUserInline(admin.StackedInline):
@@ -37,3 +37,26 @@ WarwickGGUserAdmin.search_fields = (
 
 admin.site.unregister(get_user_model())
 admin.site.register(get_user_model(), WarwickGGUserAdmin)
+
+class SUMemberAdmin(admin.ModelAdmin):
+    list_display = (
+        "uniqueId",
+        "firstName",
+        "lastName",
+        "emailAddress",
+        "firstSeen",
+        "lastSeen",
+        "webgroups"
+    )
+
+    search_fields = (
+        "uniqueId",
+        "firstName",
+        "lastName",
+        "emailAddress",
+        "webgroups"
+    )
+
+    list_filter = ("firstSeen", "lastSeen")
+
+admin.site.register(SUMember, SUMemberAdmin)

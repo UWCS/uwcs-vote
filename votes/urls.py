@@ -12,6 +12,7 @@ from .views import (
     FPTPResultView,
     FPTPVoteView,
     HomeView,
+    DateTicketView,
     IDTicketView,
     ResetVoteView,
     ResultView,
@@ -50,6 +51,7 @@ urlpatterns = [
     path("admin/reset_vote/", ResetVoteView.as_view(), name="reset_vote"),
     path("admin/tickets/", TicketView.as_view(), name="tickets"),
     path("admin/tickets/id/", IDTicketView.as_view(), name="tickets_id"),
+    path("admin/tickets/date/", DateTicketView.as_view(), name="tickets_date"),
     path("admin/tickets/delete/", DeleteTicketView.as_view(), name="tickets_delete"),
     path("admin/create/", CreateElection.as_view(), name="create_election"),
     path(

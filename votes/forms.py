@@ -6,8 +6,10 @@ from django.forms import (
     ModelMultipleChoiceField,
     Textarea,
     UUIDField,
+    DateTimeField,
 )
 from django.urls import reverse_lazy
+import django as django
 
 from .models import Candidate, Election, Ticket
 
@@ -21,12 +23,23 @@ MD_INPUT_TEXT = {
     "data-endpoint": reverse_lazy("utilities:preview_safe"),
 }
 
+class CommaSeparatedListField(CharField):
+    def to_python(self, value):
+        if not value:
+            return []
+        return [item.strip() for item in value.split(',') if item.strip()]
+
+    def prepare_value(self, value):
+        if isinstance(value, list):
+            return ", ".join(value)
+        return value
 
 class ElectionForm(ModelForm):
     class Meta:
         model = Election
-        fields = ["name", "description", "vote_type", "max_votes", "seats", "open"]
-        widgets = {"description": Textarea(attrs=MD_INPUT_SAFE)}
+        fields = ["name", "description", "vote_type", "max_votes", "seats", "open", "self_id_eligibility_confirmation", "required_webgroups"]
+        widgets = {"description": Textarea(attrs=MD_INPUT_SAFE), "self_id_eligibility_confirmation": Textarea(attrs=MD_INPUT_SAFE)}
+    required_webgroups = CommaSeparatedListField(help_text="Required webgroups to be eligible to vote, separated by commas (e.g. all-block-1, all-postgraduates)", required=False)
 
 
 class CandidateForm(ModelForm):
@@ -41,6 +54,17 @@ class IDTicketForm(Form):
         help_text="A list of whitespace separated uni-ids",
         widget=Textarea(),
         label="IDs",
+    )
+    elections = ModelMultipleChoiceField(Election.objects.filter(archived=False))
+
+class DateTimeInput(django.forms.DateTimeInput):
+    input_type = 'datetime-local'
+
+class DateTicketForm(Form):
+    bought_membership_before = DateTimeField(
+        help_text="Cutoff date, where members who joined after this time are ineligible to vote",
+        widget=DateTimeInput(),
+        label="Membership Cutoff"
     )
     elections = ModelMultipleChoiceField(Election.objects.filter(archived=False))
 

@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django_apscheduler"
 ]
 
 MIDDLEWARE = [
@@ -128,6 +129,16 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+SOCIALACCOUNT_PROVIDERS = {
+    'uwcs': {
+        'APP': {
+            'client_id': '',
+            'secret': '',
+            'key': ''
+        }
+    }
+}
+
 # Setup Cripsy to render forms bootstrap4ish
 CRISPY_TEMPLATE_PACK = "bootstrap4"
 
@@ -161,7 +172,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 MEDIA_URL = "/media/"
 
 # Warwick SU API keys
-UWCS_API_KEY = os.environ.get("UWCS_API_KEY")
+SU_API_KEY = os.environ.get("UWCS_API_KEY")
 
 MESSAGE_TAGS = {
     message_constants.DEBUG: "alert-dark",

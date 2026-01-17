@@ -38,7 +38,30 @@
             </div>
         </div>
     </div>
-
+    {% if election.self_id_eligibility_confirmation %}
+        <div class="card border-warning mb-3 shadow-sm">
+            <div class="card-header bg-warning text-dark d-flex align-items-center">
+                <i class="fas fa-exclamation-triangle mr-2"></i>
+                <h5 class="mb-0 font-weight-bold">Restricted Election</h5>
+            </div>
+            <div class="card-body">
+                <h6 class="card-subtitle mb-3 text-muted text-uppercase small" style="letter-spacing: 0.5px;">Eligibility Criteria</h6>
+                <div class="card-text mb-3">
+                    {{ election.self_id_eligibility_confirmation|parse_md_safe }}
+                </div>
+                <input class="form-check-input ml-1" type="checkbox" value="" id="eligibilityCheck" required style="transform: scale(1.2);">
+                <label class="form-check-label font-weight-bold ml-4" for="eligibilityCheck">
+                    I confirm I meet the eligibility criteria above. My vote will not count if I do not.
+                </label>
+            </div>
+            <div class="card-footer bg-light text-muted small border-warning">
+                <i class="fas fa-info-circle mr-1"></i>
+                <strong>Notice:</strong> This election requires self-definition.
+                The returning officer may review the voter list to verify eligibility.
+                By voting, you confirm you meet the criteria above; your vote may be discounted if you do not.<br><br>
+            </div>
+        </div>
+    {% endif %}
     <div class="card">
         <div class="card-body">
             {% if election.description %}
@@ -80,8 +103,22 @@
                     </div>
                 {% endfor %}
             </form>
-            <button class="btn-outline-primary btn-block btn" data-toggle="modal" data-target="#voteModal">Submit Vote</button>
+            <button class="btn-outline-primary btn-block btn" data-toggle="modal" data-target="#voteModal" id="openModalBtn" {% if election.self_id_eligibility_confirmation %}disabled{% endif %}>Submit Vote</button>
         </div>
     </div>
+    {% if election.self_id_eligibility_confirmation %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var checkbox = document.getElementById('eligibilityCheck');
+            var button = document.getElementById('openModalBtn');
+
+            if (checkbox && button) {
+                checkbox.addEventListener('change', function() {
+                    button.disabled = !this.checked;
+                });
+            }
+        });
+    </script>
+    {% endif %}
 {% endblock %}
 
