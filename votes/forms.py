@@ -1,15 +1,15 @@
+import django as django
 from django.core.exceptions import ValidationError
 from django.forms import (
     CharField,
+    DateTimeField,
     Form,
     ModelForm,
     ModelMultipleChoiceField,
     Textarea,
     UUIDField,
-    DateTimeField,
 )
 from django.urls import reverse_lazy
-import django as django
 
 from .models import Candidate, Election, Ticket
 
@@ -78,15 +78,6 @@ class IDTicketForm(Form):
 
 class DateTimeInput(django.forms.DateTimeInput):
     input_type = "datetime-local"
-
-
-class DateTicketForm(Form):
-    bought_membership_before = DateTimeField(
-        help_text="Cutoff date, where members who joined after this time are ineligible to vote",
-        widget=DateTimeInput(),
-        label="Membership Cutoff",
-    )
-    elections = ModelMultipleChoiceField(Election.objects.filter(archived=False))
 
 
 class DeleteTicketForm(Form):

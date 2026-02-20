@@ -21,7 +21,7 @@ UWCS Vote is built and tested against Python 3.8/3.9, using Django as the web fr
     
 ## Running 
 
-Start the web server. If you are running locally, you can use the command `python manage.py runserver`. Ensure you also run `python manage.py runscheduler` to fetch the SU members list.
+Start the web server. If you are running locally, you can use the command `python manage.py runserver`.
 
 ## SSO Authentication Configuration
 

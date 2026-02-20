@@ -40,24 +40,3 @@ class WarwickVoteUser(models.Model):
     @property
     def member(self):
         return self
-
-
-class SUMember(models.Model):
-    uniqueId = models.CharField(max_length=11, unique=True)
-    firstName = models.CharField(max_length=30)
-    lastName = models.CharField(max_length=30)
-    emailAddress = models.CharField(max_length=60)
-
-    webgroups = models.JSONField(default=list, blank=True)
-
-    firstSeen = models.DateTimeField(null=True, blank=True)
-    lastSeen = models.DateTimeField(null=True, blank=True)
-
-    def save(self, *args, **kwargs):
-        if self.firstSeen is None:
-            self.firstSeen = timezone.now()
-        self.lastSeen = timezone.now()
-        super().save(*args, **kwargs)
-
-    def __str__(self):
-        return self.firstName + " " + self.lastName + "(" + self.uniqueId + ")"

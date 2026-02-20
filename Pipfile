@@ -40,6 +40,7 @@ whitenoise = "*"
 setuptools = "*"
 apscheduler = "*"
 django-apscheduler = "*"
+isort = "*"
 
 [dev-packages]
 black = "*"
