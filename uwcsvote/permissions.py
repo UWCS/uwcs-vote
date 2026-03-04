@@ -64,16 +64,4 @@ class Permissions:
             return Permissions.AppPermissions()
 
 
-class MockPerms:
-    def __getattr__(self, item):
-        return self
-
-
-PERMS = MockPerms()
-
-try:
-    PERMS = Permissions.get()
-except django.db.utils.OperationalError:
-    # breaks if there is no database, which means we cannot create a database
-    # cursed :)
-    pass
+PERMS = Permissions.get()

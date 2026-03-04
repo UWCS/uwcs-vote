@@ -9,7 +9,6 @@ https://docs.djangoproject.com/en/2.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/2.0/ref/settings/
 """
-
 import os
 
 import django.contrib.messages.constants as message_constants
@@ -39,7 +38,6 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "django_apscheduler",
 ]
 
 MIDDLEWARE = [
@@ -130,8 +128,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-SOCIALACCOUNT_PROVIDERS = {"uwcs": {"APP": {"client_id": "", "secret": "", "key": ""}}}
-
 # Setup Cripsy to render forms bootstrap4ish
 CRISPY_TEMPLATE_PACK = "bootstrap4"
 
@@ -165,7 +161,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 MEDIA_URL = "/media/"
 
 # Warwick SU API keys
-SU_API_KEY = os.environ.get("UWCS_API_KEY")
+UWCS_API_KEY = os.environ.get("UWCS_API_KEY")
 
 MESSAGE_TAGS = {
     message_constants.DEBUG: "alert-dark",
