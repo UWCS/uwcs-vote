@@ -1,4 +1,4 @@
-FROM python:3.13 AS builder
+FROM python:3.10 AS builder
 
 RUN pip install --user pipenv
 
@@ -12,7 +12,7 @@ WORKDIR /app
 
 RUN /root/.local/bin/pipenv sync
 
-FROM python:3.13 AS runtime
+FROM python:3.10 AS runtime
 
 WORKDIR /app
 
@@ -28,4 +28,4 @@ COPY . /app
 # collect static files
 RUN ["./.venv/bin/python", "manage.py", "collectstatic"]
 
-CMD ["/app/entrypoint.sh"]
+CMD ["./.venv/bin/gunicorn", "uwcsvote.wsgi",  "-w", "4", "-b", "0.0.0.0:8080"]
