@@ -1,6 +1,8 @@
+import django as django
 from django.core.exceptions import ValidationError
 from django.forms import (
     CharField,
+    DateTimeField,
     Form,
     ModelForm,
     ModelMultipleChoiceField,
@@ -22,11 +24,40 @@ MD_INPUT_TEXT = {
 }
 
 
+class CommaSeparatedListField(CharField):
+    def to_python(self, value):
+        if not value:
+            return []
+        return [item.strip() for item in value.split(",") if item.strip()]
+
+    def prepare_value(self, value):
+        if isinstance(value, list):
+            return ", ".join(value)
+        return value
+
+
 class ElectionForm(ModelForm):
     class Meta:
         model = Election
-        fields = ["name", "description", "vote_type", "max_votes", "seats", "open"]
-        widgets = {"description": Textarea(attrs=MD_INPUT_SAFE)}
+        fields = [
+            "name",
+            "description",
+            "vote_type",
+            "max_votes",
+            "seats",
+            "open",
+            "self_id_eligibility_confirmation",
+            "required_webgroups",
+        ]
+        widgets = {
+            "description": Textarea(attrs=MD_INPUT_SAFE),
+            "self_id_eligibility_confirmation": Textarea(attrs=MD_INPUT_SAFE),
+        }
+
+    required_webgroups = CommaSeparatedListField(
+        help_text="Required webgroups to be eligible to vote, separated by commas (e.g. all-block-1, all-postgraduates)",
+        required=False,
+    )
 
 
 class CandidateForm(ModelForm):
@@ -43,6 +74,10 @@ class IDTicketForm(Form):
         label="IDs",
     )
     elections = ModelMultipleChoiceField(Election.objects.filter(archived=False))
+
+
+class DateTimeInput(django.forms.DateTimeInput):
+    input_type = "datetime-local"
 
 
 class DeleteTicketForm(Form):

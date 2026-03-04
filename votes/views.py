@@ -52,6 +52,7 @@ from .models import (
     Vote,
 )
 from .stv import Election as StvCalculator
+from .utils import fetch_webgroups
 
 
 # Create your views here.
@@ -62,7 +63,16 @@ class HomeView(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         tickets = self.request.user.member.ticket_set.filter()
-        return Election.objects.filter(ticket__in=tickets, open=True)
+        elections = Election.objects.filter(ticket__in=tickets, open=True)
+        webgroups_allowed_ids = []
+
+        has_webgroups = set(fetch_webgroups(self.request.user.member.uni_id))
+        for election in elections:
+            required_webgroups = set(election.required_webgroups or [])
+            if required_webgroups.issubset(has_webgroups):
+                webgroups_allowed_ids.append(election.id)
+
+        return Election.objects.filter(id__in=webgroups_allowed_ids, open=True)
 
     def get_context_data(self, *args, **kwargs):
         ctxt = super().get_context_data(*args, **kwargs)
@@ -302,7 +312,9 @@ class ApprovalVoteView(UserPassesTestMixin, TemplateView):
         )
         return self.request.user.member.ticket_set.filter(
             election=self.election, spent=False
-        ).exists()
+        ).exists() and set(self.election.required_webgroups or []).issubset(
+            set(fetch_webgroups(self.request.user.member.uni_id))
+        )
 
     def post(self, request, **kwargs):
         self.get_context_data(**kwargs)
@@ -397,7 +409,9 @@ class FPTPVoteView(UserPassesTestMixin, TemplateView):
         )
         return self.request.user.member.ticket_set.filter(
             election=self.election, spent=False
-        ).exists()
+        ).exists() and set(self.election.required_webgroups or []).issubset(
+            set(fetch_webgroups(self.request.user.member.uni_id))
+        )
 
     def post(self, request, **kwargs):
         self.get_context_data(**kwargs)
@@ -514,7 +528,9 @@ class STVVoteView(UserPassesTestMixin, TemplateView):
         )
         return self.request.user.member.ticket_set.filter(
             election=self.election, spent=False
-        ).exists()
+        ).exists() and set(self.election.required_webgroups or []).issubset(
+            set(fetch_webgroups(self.request.user.member.uni_id))
+        )
 
     def post(self, request, **kwargs):
         self.get_context_data(**kwargs)
